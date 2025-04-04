@@ -2,7 +2,6 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.hzsxwntovbgbmxvfuqep&password=OSKO123401020304
-  jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
