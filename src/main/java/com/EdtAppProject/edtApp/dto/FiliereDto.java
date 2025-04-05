@@ -2,6 +2,7 @@ package com.EdtAppProject.edtApp.dto;
 
 import com.EdtAppProject.edtApp.entite.Enum.ENiveau;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class FiliereDto {
 
     private String description;
 
-    @NotBlank(message = "Niveau de la filère obligatoire !")
+    @NotNull(message = "Niveau de la filère obligatoire !")
     private ENiveau niveau;
 
 }

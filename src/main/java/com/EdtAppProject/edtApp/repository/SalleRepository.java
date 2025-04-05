@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface SalleRepository extends JpaRepository<Salle, String> {
 
     boolean existsByIdOrNumeroSalle(String id, String numeroSalle);
-    boolean existsByNumeroSalle(String numeroSalle);
+    boolean existsByNumeroSalleAndIdNot(String numeroSalle, String idSalle );
 }

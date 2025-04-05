@@ -1,5 +1,6 @@
 package com.EdtAppProject.edtApp.controller;
 
+import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
 import jakarta.validation.Valid;
@@ -26,6 +27,10 @@ public class AppController {
 
     private final ServiceMetier serviceMetier;
 
+    /**
+     ****************** Endpoints salles *************
+     */
+
     @PostMapping("/salle")
     public ResponseEntity<SalleDto> creerSalle(@RequestBody @Valid final SalleDto salleDto) {
         return new ResponseEntity<>(this.serviceMetier.creerSalle(salleDto), HttpStatus.CREATED);
@@ -47,4 +52,31 @@ public class AppController {
     public ResponseEntity<List<SalleDto>> listerSalle() {
         return new ResponseEntity<>(serviceMetier.listeSalle(), HttpStatus.OK);
     }
+
+    /**
+     *************  Endpoints Filières *******************
+     */
+
+    @PostMapping("/filiere")
+    public ResponseEntity<FiliereDto> creerFiliere(@RequestBody @Valid final FiliereDto filiereDto) {
+        return new ResponseEntity<>(this.serviceMetier.creerFiliere(filiereDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/filiere/{id}")
+    public ResponseEntity<FiliereDto> modifierfilere(@PathVariable("id") final String idFiliere,
+                                                  @RequestBody @Valid final FiliereDto filiereDto) {
+        return new ResponseEntity<>(this.serviceMetier.modifierFiliere(idFiliere, filiereDto), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/filiere/{id}")
+    public ResponseEntity<Void> supprimerFilere(@PathVariable("id") final String idFiliere) {
+        serviceMetier.supprimerFiliere(idFiliere);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/filiere")
+    public ResponseEntity<List<FiliereDto>> listerFiliere() {
+        return new ResponseEntity<>(serviceMetier.listeFiliere(), HttpStatus.OK);
+    }
+
 }
