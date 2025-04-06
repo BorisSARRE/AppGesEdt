@@ -1,10 +1,14 @@
 package com.EdtAppProject.edtApp.service;
 
+import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
+import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.entite.Filiere;
 import com.EdtAppProject.edtApp.entite.Salle;
 import com.EdtAppProject.edtApp.mapstruct.SbMapper;
+import com.EdtAppProject.edtApp.repository.EmploiDuTempsRepository;
 import com.EdtAppProject.edtApp.repository.FiliereRepository;
 import com.EdtAppProject.edtApp.repository.SalleRepository;
 import lombok.Getter;
@@ -24,6 +28,7 @@ public class ServiceMetier {
 
     private final SalleRepository salleRepository;
     private final FiliereRepository filiereRepository;
+    private final EmploiDuTempsRepository emploiDuTempsRepository;
     private final SbMapper mapper;
 
     /*
@@ -142,5 +147,115 @@ public class ServiceMetier {
         List<Filiere> filieres = filiereRepository.findAll();
         return filieres.stream().map(this.mapper::maps).toList();
     }
+
+    /**
+     ***************** Gestion des emplois du temps *******************
+     */
+
+    /**
+     * Créer un emploi du temps
+     * @param edt
+     * @return EmploiDuTempsDto
+     */
+    public EmploiDuTempsDto creerEdt(EmploiDuTempsDto edt){
+
+        if (edt.getDatePublication() != null && edt.getDateDebut() != null &&
+        edt.getDatePublication().toLocalDate().isAfter(edt.getDateDebut())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date de publication doit être antérieure " +
+                    "à la date de début" );
+
+        } else if (emploiDuTempsRepository.existsByDateDebutAndFiliere(edt.getDateDebut(),
+                filiereRepository.getReferenceById(edt.getIdFiliere()))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps est déjà établie pour "+
+                    filiereRepository.getReferenceById(edt.getIdFiliere()).getNomFiliere() + " " +
+                    filiereRepository.getReferenceById(edt.getIdFiliere()).getNiveau());
+
+        }else {
+            EmploiDuTemps emploiDuTemps = this.mapper.maps(edt);
+            //emploiDuTemps.setDatePublication(LocalDateTime.now());  sera active dans la fonction publier un edt
+            // Et l'on pourra mettre le statut à PUBLIE dans cette fonction.
+            emploiDuTemps.setDateFin(edt.getDateDebut().plusDays(5));
+            emploiDuTemps.setStatutEdt(EStatutEdt.BROUILLON);
+            return this.mapper.maps(this.emploiDuTempsRepository.save(emploiDuTemps));
+        }
+    }
+
+    /**
+     * Modifier emploi du temps.
+     * @param idEdt
+     * @param emploiDuTempsDto
+     * @return EmploiDuTempsDto
+     */
+    public EmploiDuTempsDto modifierEdt(String idEdt, EmploiDuTempsDto emploiDuTempsDto){
+
+        if (!emploiDuTempsRepository.existsById(idEdt) || emploiDuTempsDto.getStatutEdt() != EStatutEdt.BROUILLON ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Impossible de modifier ! ");
+        }else {
+            if (emploiDuTempsDto.getDatePublication() != null && emploiDuTempsDto.getDateDebut() != null &&
+                    emploiDuTempsDto.getDatePublication().toLocalDate().isAfter(emploiDuTempsDto.getDateDebut())){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date de publication doit être antérieure " +
+                        "à la date de début" );
+
+            } else if (emploiDuTempsRepository.existsByDateDebutAndFiliere(emploiDuTempsDto.getDateDebut(),
+                    filiereRepository.getReferenceById(emploiDuTempsDto.getIdFiliere()))) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps est déjà établie pour "+
+                        filiereRepository.getReferenceById(emploiDuTempsDto.getIdFiliere()).getNomFiliere() + " " +
+                        filiereRepository.getReferenceById(emploiDuTempsDto.getIdFiliere()).getNiveau());
+
+            }else {
+
+                EmploiDuTemps emploiDuTemps = this.emploiDuTempsRepository.getReferenceById(idEdt);
+                emploiDuTemps.setDateDebut(emploiDuTempsDto.getDateDebut());
+                emploiDuTemps.setDateFin(emploiDuTempsDto.getDateDebut().plusDays(5));
+                emploiDuTemps.setStatutEdt(EStatutEdt.BROUILLON);
+                emploiDuTemps.setFiliere(filiereRepository.getReferenceById(emploiDuTempsDto.getIdFiliere()));
+                return this.mapper.maps(this.emploiDuTempsRepository.save(emploiDuTemps));
+            }
+        }
+
+    }
+
+    /**
+     * Supprimer un emploi du temps.
+     * @param idEdt
+     */
+    public void supprimerEdt(String idEdt){
+
+            if (! emploiDuTempsRepository.existsById(idEdt)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
+            }else {
+                emploiDuTempsRepository.deleteById(idEdt);
+            }
+    }
+
+
+    /**
+     * Lister les emplois du temps en fonction du nom de recherche de la filiere.
+     * @param nomFiliere
+     * @return List<EmploiDuTempsDto>
+     */
+    public List<EmploiDuTempsDto> listEdtFiliere(String nomFiliere){
+        List<EmploiDuTemps> emploiDuTempsList = emploiDuTempsRepository.findByFiliereId(nomFiliere);
+        return emploiDuTempsList.stream().map(this.mapper::maps).toList();
+    }
+
+    /**
+     * Clore un edt.
+     * @param idEdt
+     */
+    public void cloreEdt(String idEdt){
+        if (! emploiDuTempsRepository.existsById(idEdt)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
+        } else if (emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.PUBLIE ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " Cet emploi du temps ne peut pas être clos " +
+                    "car il n'est pas encore publié ! ");
+        } else {
+            EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(idEdt);
+            emploiDuTemps.setStatutEdt(EStatutEdt.CLOS);
+            this.emploiDuTempsRepository.save(emploiDuTemps);
+
+        }
+    }
+
 
 }

@@ -2,6 +2,7 @@ package com.EdtAppProject.edtApp.dto;
 
 import com.EdtAppProject.edtApp.entite.Enum.ECrenaux;
 import com.EdtAppProject.edtApp.entite.Enum.EDisponibiliteProf;
+import com.EdtAppProject.edtApp.entite.Enum.EJourSemaine;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCours;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class CoursDto {
     private EStatutCours statutCours;
 
     private EDisponibiliteProf disponibiliteProf;
+
+    private EJourSemaine jourSemaine;
 
     @NotBlank(message = "Identifiant de la salle obligatoire !")
     private String idSalle;

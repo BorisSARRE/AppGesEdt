@@ -1,7 +1,10 @@
 package com.EdtAppProject.edtApp.entite;
 
+import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,9 +41,9 @@ public class EmploiDuTemps {
     @Column(name = "dateFin", nullable = false)
     private LocalDate dateFin;
 
-    @ManyToOne
-    @JoinColumn(name = "cours")
-    private Cours cours;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statutEdt", nullable = false)
+    private EStatutEdt statutEdt;
 
     @ManyToOne
     @JoinColumn(name = "filiere")

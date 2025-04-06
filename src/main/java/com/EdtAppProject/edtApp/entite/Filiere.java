@@ -3,6 +3,8 @@ package com.EdtAppProject.edtApp.entite;
 import com.EdtAppProject.edtApp.entite.Enum.ENiveau;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,6 +30,7 @@ public class Filiere {
     @Column(name = "description")
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "niveau", nullable = false)
     private ENiveau niveau;
 }

@@ -1,5 +1,6 @@
 package com.EdtAppProject.edtApp.controller;
 
+import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -78,5 +80,44 @@ public class AppController {
     public ResponseEntity<List<FiliereDto>> listerFiliere() {
         return new ResponseEntity<>(serviceMetier.listeFiliere(), HttpStatus.OK);
     }
+
+    /**
+     ********** Endpoints pour Emploi du temps ***********************
+     */
+
+    @PostMapping("/edt")
+    public ResponseEntity<EmploiDuTempsDto> creerEdt(@RequestBody @Valid final EmploiDuTempsDto emploiDuTempsDto) {
+        return new ResponseEntity<>(this.serviceMetier.creerEdt(emploiDuTempsDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/edt/{id}")
+    public ResponseEntity<EmploiDuTempsDto> modifierEdt(@PathVariable("id") final String idEdt,
+                                                     @RequestBody @Valid final EmploiDuTempsDto emploiDuTempsDto) {
+        return new ResponseEntity<>(this.serviceMetier.modifierEdt(idEdt, emploiDuTempsDto), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/edt/{id}")
+    public ResponseEntity<Void> supprimerEdt(@PathVariable("id") final String idEdt) {
+        serviceMetier.supprimerEdt(idEdt);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * Rechercher l'emploi du temps par un nom de filière.
+     * @param recherche
+     * @return
+     */
+    @GetMapping("/edt")
+    public ResponseEntity<List<EmploiDuTempsDto>> listEdtFiliere(@RequestParam(value = "recherche", required = false)
+                                                                 final String recherche) {
+        return new ResponseEntity<>(serviceMetier.listEdtFiliere(recherche), HttpStatus.OK);
+    }
+
+    @PutMapping("/edt2/{id}")
+    public ResponseEntity<Void> cloreEdt(@PathVariable("id") final String idEdt) {
+        this.serviceMetier.cloreEdt(idEdt);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 }

@@ -4,6 +4,8 @@ import com.EdtAppProject.edtApp.entite.Enum.ETitreEtudiant;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ public class Etudiant extends Utilisateur {
     @Column(name = "ine", nullable = false)
     private String ine;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "titreEtudiant", nullable = false)
     private ETitreEtudiant titreEtudiant;
 

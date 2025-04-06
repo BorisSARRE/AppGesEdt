@@ -1,7 +1,8 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.hzsxwntovbgbmxvfuqep&password=OSKO123401020304
+    url: jdbc:postgresql://db.utaboakoxfaczrfylszg.supabase.co:5432/postgres?user=postgres&password=OSKOgroupeprojectbd
+  jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -9,5 +10,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+debug: true
+
 server:
-  port: 8085
+  port: 8086

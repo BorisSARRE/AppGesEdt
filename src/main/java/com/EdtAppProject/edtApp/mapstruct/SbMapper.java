@@ -1,11 +1,14 @@
 package com.EdtAppProject.edtApp.mapstruct;
 
+import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
 import com.EdtAppProject.edtApp.entite.Filiere;
 import com.EdtAppProject.edtApp.entite.Salle;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
@@ -23,5 +26,12 @@ public interface SbMapper {
     @InheritInverseConfiguration
     Filiere maps(FiliereDto dto);
 
+    @Mappings({
+            @Mapping(target = "idFiliere", source = "filiere.id")
+    })
+    EmploiDuTempsDto maps(EmploiDuTemps entity);
+
+    @InheritInverseConfiguration
+    EmploiDuTemps maps(EmploiDuTempsDto dto);
 
 }

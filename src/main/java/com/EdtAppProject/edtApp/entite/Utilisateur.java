@@ -5,6 +5,8 @@ import com.EdtAppProject.edtApp.entite.Enum.EStatutCompte;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,6 +33,8 @@ public class Utilisateur {
     @Column(name = "prenom", nullable = false)
     private String prenom;
 
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "sexe", nullable = false)
     private ESexe sexe;
 
@@ -43,6 +47,7 @@ public class Utilisateur {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "statutCompte")
     private EStatutCompte statutCompte;
 }

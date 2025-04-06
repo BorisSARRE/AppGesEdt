@@ -3,6 +3,8 @@ package com.EdtAppProject.edtApp.entite;
 import com.EdtAppProject.edtApp.entite.Enum.ESatutDevoir;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +34,7 @@ public class Devoir {
     @Column(name = "duree", nullable = false)
     private float duree;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "statutDevoir")
     private ESatutDevoir statutDevoir;
 

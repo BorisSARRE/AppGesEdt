@@ -3,6 +3,8 @@ package com.EdtAppProject.edtApp.entite;
 import com.EdtAppProject.edtApp.entite.Enum.EDisponibiliteSalle;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,9 +28,10 @@ public class Salle {
     @Column(name = "numeroSalle", nullable = false)
     private String numeroSalle;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "disponibiliteSalle")
     private EDisponibiliteSalle disponibiliteSalle;
 
-    @Version
-    private Long version;
+//    @Version
+//    private Long version;
 }
