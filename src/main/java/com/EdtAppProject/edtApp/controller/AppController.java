@@ -2,6 +2,7 @@ package com.EdtAppProject.edtApp.controller;
 
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
+import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
@@ -119,6 +120,15 @@ public class AppController {
     public ResponseEntity<Void> cloreEdt(@PathVariable("id") final String idEdt) {
         this.serviceMetier.cloreEdt(idEdt);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     ********** Endpoints pour Matiere ***********************
+     */
+
+    @PostMapping("/matiere")
+    public ResponseEntity<MatiereDto> creerMatiere(@RequestBody @Valid final MatiereDto matiereDto) {
+        return new ResponseEntity<>(this.serviceMetier.creerMatiere(matiereDto), HttpStatus.CREATED);
     }
 
 

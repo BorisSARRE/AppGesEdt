@@ -25,7 +25,7 @@ public class MatiereDto {
     @NotNull
     private int volumeHoraire;
 
-    @NotBlank(message = " Semestre du cours obligatoire !")
+    @NotNull(message = " Semestre du cours obligatoire !")
     private ESemestre semestre;
 
     private EStatutMatiere statutMatiere;

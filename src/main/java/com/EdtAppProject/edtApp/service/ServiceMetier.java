@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
 
@@ -289,16 +290,34 @@ public class ServiceMetier {
      */
     public MatiereDto creerMatiere(final MatiereDto matiereDto){
 
-        if (matiereRepository.existsByIntituleAndFiliereId(matiereDto.getIntitule(), matiereDto.getIdFiliere())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ce Module existe déjà pour la filiere "
-            + filiereRepository.getReferenceById(matiereDto.getIdFiliere()).getNomFiliere());
-        }else {
-            Matiere matiere = this.matiereRepository.getReferenceById(matiereDto.getIdFiliere());
+        String intituleNettoye = nettoyerChaineDeCaharactere(matiereDto.getIntitule());
+
+        if (matiereRepository.existsByIntituleAndFiliereId(intituleNettoye, matiereDto.getIdFiliere())) {
+            String nomFiliere = filiereRepository.findById(matiereDto.getIdFiliere())
+                    .map(Filiere::getNomFiliere)
+                    .orElse("inconnue");
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ce Module existe déjà pour la filière " + nomFiliere);
+        } else {
+            Matiere matiere = this.mapper.maps(matiereDto);
+            matiere.setIntitule(intituleNettoye);
             matiere.setStatutMatiere(EStatutMatiere.NON_DEBUTE);
             return this.mapper.maps(this.matiereRepository.save(matiere));
         }
     }
 
+    public static String nettoyerChaineDeCaharactere(String input) {
+        // Supprimer les espaces
+        String sansEspace = input.replaceAll("\\s+", " ");
+
+        // Normaliser la chaîne pour enlever les accents
+        String chaineNormalise = Normalizer.normalize(sansEspace, Normalizer.Form.NFD);
+        // Supprimer les accents
+        String resultat = chaineNormalise.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+        return resultat;
+    }
 
 
 
