@@ -1,13 +1,7 @@
 package com.EdtAppProject.edtApp.mapstruct;
 
-import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
-import com.EdtAppProject.edtApp.dto.FiliereDto;
-import com.EdtAppProject.edtApp.dto.MatiereDto;
-import com.EdtAppProject.edtApp.dto.SalleDto;
-import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
-import com.EdtAppProject.edtApp.entite.Filiere;
-import com.EdtAppProject.edtApp.entite.Matiere;
-import com.EdtAppProject.edtApp.entite.Salle;
+import com.EdtAppProject.edtApp.dto.*;
+import com.EdtAppProject.edtApp.entite.*;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -43,5 +37,13 @@ public interface SbMapper {
 
     @InheritInverseConfiguration
     Matiere maps(MatiereDto dto);
+
+    @Mappings({
+            @Mapping(target = "idEnseignant", source = "enseignant.id")
+    })
+    IndisponibiliteDto maps(Indisponibilite entity);
+
+    @InheritInverseConfiguration
+    Indisponibilite maps(IndisponibiliteDto dto);
 
 }

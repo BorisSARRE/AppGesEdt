@@ -4,17 +4,17 @@ import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.dto.IndisponibiliteDto;
 import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutMatiere;
 import com.EdtAppProject.edtApp.entite.Filiere;
 import com.EdtAppProject.edtApp.entite.Matiere;
 import com.EdtAppProject.edtApp.entite.Salle;
+import com.EdtAppProject.edtApp.entite.Enseignant;
+import com.EdtAppProject.edtApp.entite.Indisponibilite;
 import com.EdtAppProject.edtApp.mapstruct.SbMapper;
-import com.EdtAppProject.edtApp.repository.EmploiDuTempsRepository;
-import com.EdtAppProject.edtApp.repository.FiliereRepository;
-import com.EdtAppProject.edtApp.repository.MatiereRepository;
-import com.EdtAppProject.edtApp.repository.SalleRepository;
+import com.EdtAppProject.edtApp.repository.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -36,6 +37,8 @@ public class ServiceMetier {
     private final FiliereRepository filiereRepository;
     private final EmploiDuTempsRepository emploiDuTempsRepository;
     private final MatiereRepository matiereRepository;
+    private final IndisponibiliteRepository indisponibiliteRepository;
+    private final EnseignantRepository enseignantRepository;
     private final SbMapper mapper;
 
     /*
@@ -319,6 +322,77 @@ public class ServiceMetier {
         return resultat;
     }
 
+    /**
+     * ******************** Gestion des Indisponibilites ******************
+     */
 
+    /**
+     * Créer une indisponibilité.
+     * @param indisponibiliteDto
+     * @return IndisponibiliteDto
+     */
+    public IndisponibiliteDto createIndisponibilite( IndisponibiliteDto indisponibiliteDto) {
+        Enseignant enseignant = enseignantRepository.findById(indisponibiliteDto.getIdEnseignant())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: " + indisponibiliteDto.getIdEnseignant()));
+
+        Indisponibilite indisponibilite = mapper.maps(indisponibiliteDto);
+        indisponibilite.setEnseignant(enseignant);
+        Indisponibilite savedIndisponibilite = indisponibiliteRepository.save(indisponibilite);
+
+        return mapper.maps(savedIndisponibilite);
+    }
+
+    /**
+     * Récupérer une indisponibilité par son ID.
+     * @param id L'identifiant de l'indisponibilité
+     * @return IndisponibiliteDto
+     */
+    public IndisponibiliteDto getIndisponibiliteById(String id) {
+        Indisponibilite indisponibilite = indisponibiliteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + id));
+        return mapper.maps(indisponibilite);
+    }
+
+    /**
+     * Récupérer toutes les indisponibilités.
+     * @return List<IndisponibiliteDto>
+     */
+    public List<IndisponibiliteDto> getAllIndisponibilites() {
+        List<Indisponibilite> indisponibilites = indisponibiliteRepository.findAll();
+        return indisponibilites.stream()
+                .map(mapper::maps)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Mettre à jour une indisponibilité.
+     * @param indisponibiliteDto Les nouvelles informations de l'indisponibilité
+     * @return IndisponibiliteDto
+     */
+    public IndisponibiliteDto updateIndisponibilite( IndisponibiliteDto indisponibiliteDto) {
+        String id = indisponibiliteDto.getId();
+        Indisponibilite existingIndisponibilite = indisponibiliteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + id));
+
+        Enseignant enseignant = enseignantRepository.findById(indisponibiliteDto.getIdEnseignant())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: " + indisponibiliteDto.getIdEnseignant()));
+
+        Indisponibilite updatedIndisponibilite = mapper.maps(indisponibiliteDto);
+        updatedIndisponibilite.setId(id);
+        updatedIndisponibilite.setEnseignant(enseignant);
+
+        Indisponibilite savedIndisponibilite = indisponibiliteRepository.save(updatedIndisponibilite);
+        return mapper.maps(savedIndisponibilite);
+    }
+
+    /**
+     * Supprimer une indisponibilité.
+     * @param id L'identifiant de l'indisponibilité à supprimer
+     */
+    public void deleteIndisponibilite(String id) {
+        Indisponibilite indisponibilite = indisponibiliteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + id));
+        indisponibiliteRepository.delete(indisponibilite);
+    }
 
 }

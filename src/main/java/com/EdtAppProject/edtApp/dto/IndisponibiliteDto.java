@@ -24,7 +24,7 @@ public class IndisponibiliteDto {
     private LocalDate dateFin;
 
     @NotBlank(message = "Motif d'indisponibilité obligatoire !")
-    private String modif;
+    private String motif;
 
     @NotBlank(message = "Identifiant de l'enseignant obligatoire !")
     private String idEnseignant;
