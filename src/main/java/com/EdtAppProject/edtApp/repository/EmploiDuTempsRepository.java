@@ -12,5 +12,5 @@ import java.util.List;
 public interface EmploiDuTempsRepository extends JpaRepository<EmploiDuTemps, String> {
 
     boolean existsByDateDebutAndFiliere(LocalDate dateDebut, Filiere filiere);
-    List<EmploiDuTemps> findByFiliereId(String nomFiliere);
+    List<EmploiDuTemps> findByFiliereNomFiliereContainingIgnoreCase(String nomFiliere);
 }

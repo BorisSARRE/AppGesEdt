@@ -2,14 +2,18 @@ package com.EdtAppProject.edtApp.service;
 
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
+import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
+import com.EdtAppProject.edtApp.entite.Enum.EStatutMatiere;
 import com.EdtAppProject.edtApp.entite.Filiere;
+import com.EdtAppProject.edtApp.entite.Matiere;
 import com.EdtAppProject.edtApp.entite.Salle;
 import com.EdtAppProject.edtApp.mapstruct.SbMapper;
 import com.EdtAppProject.edtApp.repository.EmploiDuTempsRepository;
 import com.EdtAppProject.edtApp.repository.FiliereRepository;
+import com.EdtAppProject.edtApp.repository.MatiereRepository;
 import com.EdtAppProject.edtApp.repository.SalleRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -29,6 +34,7 @@ public class ServiceMetier {
     private final SalleRepository salleRepository;
     private final FiliereRepository filiereRepository;
     private final EmploiDuTempsRepository emploiDuTempsRepository;
+    private final MatiereRepository matiereRepository;
     private final SbMapper mapper;
 
     /*
@@ -40,7 +46,7 @@ public class ServiceMetier {
      * @param filiereDto
      * @return SalleDto
      */
-    public SalleDto creerSalle(SalleDto filiereDto){
+    public SalleDto creerSalle(final SalleDto filiereDto){
         if (salleRepository.existsByIdOrNumeroSalle(filiereDto.getId(), filiereDto.getNumeroSalle())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La salle existe déjà !");
         }else {
@@ -55,7 +61,7 @@ public class ServiceMetier {
      * @param filiereDto
      * @return SalleDto
      */
-    public SalleDto modifierSalle(String idSalle, SalleDto filiereDto){
+    public SalleDto modifierSalle(final String idSalle,final SalleDto filiereDto){
         if (salleRepository.existsByNumeroSalleAndIdNot(filiereDto.getNumeroSalle(),idSalle)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La salle existe déjà !");
         }else {
@@ -70,7 +76,7 @@ public class ServiceMetier {
      * Supprimer une salle0.
      * @param idSalle
      */
-    public void supprimerSalle(String idSalle){
+    public void supprimerSalle(final String idSalle){
 
         if (! salleRepository.existsById(idSalle)){
             throw new ResponseStatusException(HttpStatus.OK, "Cette salle n'existe pas !");
@@ -97,7 +103,7 @@ public class ServiceMetier {
      * @param filiereDto
      * @return FiliereDto
      */
-    public FiliereDto creerFiliere(FiliereDto filiereDto){
+    public FiliereDto creerFiliere(final FiliereDto filiereDto){
 
             if (filiereRepository.existsByNomFiliereAndNiveau(filiereDto.getNomFiliere(),filiereDto.getNiveau())){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La Filière existe déjà !");
@@ -114,7 +120,7 @@ public class ServiceMetier {
      * @param filiereDto
      * @return FiliereDto
      */
-    public FiliereDto modifierFiliere(String idFiliere, FiliereDto filiereDto){
+    public FiliereDto modifierFiliere(final String idFiliere,final FiliereDto filiereDto){
         if (filiereRepository.existsByNomFiliereAndNiveau(filiereDto.getNomFiliere(),filiereDto.getNiveau())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La filiere existe déjà !");
         }else {
@@ -130,7 +136,7 @@ public class ServiceMetier {
      * Supprimer filière.
      * @param idFiliere
      */
-    public void supprimerFiliere(String idFiliere){
+    public void supprimerFiliere(final String idFiliere){
 
         if (! filiereRepository.existsById(idFiliere)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
@@ -157,7 +163,7 @@ public class ServiceMetier {
      * @param edt
      * @return EmploiDuTempsDto
      */
-    public EmploiDuTempsDto creerEdt(EmploiDuTempsDto edt){
+    public EmploiDuTempsDto creerEdt(final EmploiDuTempsDto edt){
 
         if (edt.getDatePublication() != null && edt.getDateDebut() != null &&
         edt.getDatePublication().toLocalDate().isAfter(edt.getDateDebut())){
@@ -186,7 +192,7 @@ public class ServiceMetier {
      * @param emploiDuTempsDto
      * @return EmploiDuTempsDto
      */
-    public EmploiDuTempsDto modifierEdt(String idEdt, EmploiDuTempsDto emploiDuTempsDto){
+    public EmploiDuTempsDto modifierEdt(final String idEdt,final EmploiDuTempsDto emploiDuTempsDto){
 
         if (!emploiDuTempsRepository.existsById(idEdt) || emploiDuTempsDto.getStatutEdt() != EStatutEdt.BROUILLON ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Impossible de modifier ! ");
@@ -219,11 +225,14 @@ public class ServiceMetier {
      * Supprimer un emploi du temps.
      * @param idEdt
      */
-    public void supprimerEdt(String idEdt){
+    public void supprimerEdt(final String idEdt){
 
             if (! emploiDuTempsRepository.existsById(idEdt)){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
-            }else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps n'existe pas !");
+            } else if (emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.BROUILLON) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CCet emploi du tempse ne peut pas " +
+                        "être supprimé !");
+            } else {
                 emploiDuTempsRepository.deleteById(idEdt);
             }
     }
@@ -234,28 +243,63 @@ public class ServiceMetier {
      * @param nomFiliere
      * @return List<EmploiDuTempsDto>
      */
-    public List<EmploiDuTempsDto> listEdtFiliere(String nomFiliere){
-        List<EmploiDuTemps> emploiDuTempsList = emploiDuTempsRepository.findByFiliereId(nomFiliere);
-        return emploiDuTempsList.stream().map(this.mapper::maps).toList();
+    public List<EmploiDuTempsDto> listEdtFiliere(final String nomFiliere){
+        if (nomFiliere == null || nomFiliere.isEmpty()) {
+            return (emploiDuTempsRepository.findAll()).stream().map(this.mapper::maps).toList();
+        } else {
+            return (emploiDuTempsRepository.findByFiliereNomFiliereContainingIgnoreCase(nomFiliere)).stream()
+                    .map(this.mapper::maps).toList();
+        }
     }
 
     /**
      * Clore un edt.
      * @param idEdt
+     * @return ResponseStatusException
      */
-    public void cloreEdt(String idEdt){
-        if (! emploiDuTempsRepository.existsById(idEdt)){
+    public ResponseStatusException cloreEdt(final String idEdt){
+
+        Optional<EmploiDuTemps> emploiDuTemps = emploiDuTempsRepository.findById(idEdt);
+
+        if (emploiDuTemps.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
         } else if (emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.PUBLIE ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " Cet emploi du temps ne peut pas être clos " +
                     "car il n'est pas encore publié ! ");
         } else {
-            EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(idEdt);
-            emploiDuTemps.setStatutEdt(EStatutEdt.CLOS);
-            this.emploiDuTempsRepository.save(emploiDuTemps);
+            List<EmploiDuTempsDto> emploi = emploiDuTemps.stream().map(c -> {
+                c.setStatutEdt(EStatutEdt.CLOS);
+                this.emploiDuTempsRepository.save(c);
+                return this.mapper.maps(c);
+            }).toList();
 
+            return new ResponseStatusException(HttpStatus.OK);
         }
     }
+
+
+    /**
+     ****************** Gestion des matieres ************************
+     */
+
+    /**
+     * Créer une matiere.
+     * @param matiereDto
+     * @return MatiereDto
+     */
+    public MatiereDto creerMatiere(final MatiereDto matiereDto){
+
+        if (matiereRepository.existsByIntituleAndFiliereId(matiereDto.getIntitule(), matiereDto.getIdFiliere())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ce Module existe déjà pour la filiere "
+            + filiereRepository.getReferenceById(matiereDto.getIdFiliere()).getNomFiliere());
+        }else {
+            Matiere matiere = this.matiereRepository.getReferenceById(matiereDto.getIdFiliere());
+            matiere.setStatutMatiere(EStatutMatiere.NON_DEBUTE);
+            return this.mapper.maps(this.matiereRepository.save(matiere));
+        }
+    }
+
+
 
 
 }

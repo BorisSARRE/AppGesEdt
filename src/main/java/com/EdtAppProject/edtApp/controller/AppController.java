@@ -3,6 +3,7 @@ package com.EdtAppProject.edtApp.controller;
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -113,7 +115,7 @@ public class AppController {
         return new ResponseEntity<>(serviceMetier.listEdtFiliere(recherche), HttpStatus.OK);
     }
 
-    @PutMapping("/edt2/{id}")
+    @PatchMapping("/edt/{id}")
     public ResponseEntity<Void> cloreEdt(@PathVariable("id") final String idEdt) {
         this.serviceMetier.cloreEdt(idEdt);
         return new ResponseEntity<>(HttpStatus.OK);
