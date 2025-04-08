@@ -20,7 +20,7 @@ import lombok.Setter;
 public class Parent extends Utilisateur {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeParent", nullable = false)
+    @Column(name = "typeParent")
     private ETypeParent typeParent;
 
     @Column(name = "lieuResidence")

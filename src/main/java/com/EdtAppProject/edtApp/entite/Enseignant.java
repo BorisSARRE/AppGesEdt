@@ -1,6 +1,7 @@
 package com.EdtAppProject.edtApp.entite;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
@@ -19,13 +20,13 @@ import java.util.List;
 //@DiscriminatorValue("ENSEIGNANT")
 public class Enseignant extends Utilisateur{
 
-    @Column(name = "matricule", nullable = false)
+    @Column(name = "matricule")
     private String matricule;
 
     @Column(name = "grade")
     private String grade;
 
-    @Column(name = "specialite", nullable = false)
+    @Column(name = "specialite")
     private String specialite;
 
     @ManyToMany(mappedBy = "enseignants")

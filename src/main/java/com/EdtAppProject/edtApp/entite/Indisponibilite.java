@@ -31,7 +31,7 @@ public class Indisponibilite {
     @Column(name = "dateFin")
     private LocalDate dateFin;
 
-    @Column(name = "motif")
+    @Column(name = "motif", nullable = false)
     private String motif;
 
     @ManyToOne

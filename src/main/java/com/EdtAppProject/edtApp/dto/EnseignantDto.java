@@ -17,10 +17,9 @@ public class EnseignantDto extends UtilisateurDto {
 
     private String grade;
 
-    @NotBlank(message = "La specialite est obligatoire")
     private String specialite;
 
-    @NotBlank(message = "Identifiant du module obligatoire !")
+   // @NotBlank(message = "Identifiant du module obligatoire !")
     private String idModule;
 
 }

@@ -23,6 +23,6 @@ public class Administration extends Utilisateur {
     private String matricule;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeAdmin", nullable = false)
+    @Column(name = "typeAdmin", nullable = true)
     private ETypeAdmin typeAdmin;
 }

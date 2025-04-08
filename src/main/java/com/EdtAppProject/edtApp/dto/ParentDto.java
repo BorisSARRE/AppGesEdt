@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ParentDto extends UtilisateurDto {
 
-    @NotBlank(message = "Type du parent obligatoire !")
+    //@NotBlank(message = "Type du parent obligatoire !")
     private ETypeParent typeParent;
 
     private String lieuResidence;

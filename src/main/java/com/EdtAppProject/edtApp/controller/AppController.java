@@ -1,10 +1,12 @@
 package com.EdtAppProject.edtApp.controller;
 
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
+import com.EdtAppProject.edtApp.dto.EnseignantDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.IndisponibiliteDto;
 import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.entite.Enseignant;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.entite.Matiere;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
@@ -193,9 +195,10 @@ public class AppController {
      * @param indisponibiliteDto
      * @return ResponseEntity<IndisponibiliteDto>
      */
-    @PutMapping("/indisponibilites")
-    public ResponseEntity<IndisponibiliteDto> updateIndisponibilite(@Valid @RequestBody final IndisponibiliteDto indisponibiliteDto) {
-        IndisponibiliteDto updatedDto = serviceMetier.updateIndisponibilite(indisponibiliteDto);
+    @PutMapping("/indisponibilites/{id}")
+    public ResponseEntity<IndisponibiliteDto> updateIndisponibilite(@PathVariable("id") final String idIndisponibilite,
+                                                                    @Valid @RequestBody final IndisponibiliteDto indisponibiliteDto) {
+        IndisponibiliteDto updatedDto = serviceMetier.updateIndisponibilite(idIndisponibilite, indisponibiliteDto);
         return new ResponseEntity<>(updatedDto, HttpStatus.OK);
     }
 
@@ -207,8 +210,16 @@ public class AppController {
     @DeleteMapping("/indisponibilites/{id}")
     public ResponseEntity<Void> deleteIndisponibilite(@PathVariable("id") final String id) {
         serviceMetier.deleteIndisponibilite(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * *************** Endpoint utilisateur
+     */
+    @PostMapping("/enseignant")
+    public ResponseEntity<EnseignantDto> createEnseignant(@Valid @RequestBody final EnseignantDto enseignantDto) {
+        EnseignantDto enseignant = serviceMetier.creerEnseignant(enseignantDto);
+        return new ResponseEntity<>(enseignant, HttpStatus.CREATED);
+    }
 
 }

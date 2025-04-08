@@ -13,15 +13,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EtudiantDto extends UtilisateurDto {
 
-    @NotBlank(message = "INE de l'étudiant obligatoire !")
+   // @NotBlank(message = "INE de l'étudiant obligatoire !")
     private String ine;
 
-    @NotBlank(message = "Titre de l'étudiant obligatoire !")
+    //@NotBlank(message = "Titre de l'étudiant obligatoire !")
     private ETitreEtudiant titreEtudiant;
 
-    @NotBlank(message = "Identifiant du parent obligatoire !")
+    //@NotBlank(message = "Identifiant du parent obligatoire !")
     private String idParent;
 
-    @NotBlank(message = "Identifiant de la filière obligatoire !")
+   // @NotBlank(message = "Identifiant de la filière obligatoire !")
     private String idFiliere;
 }

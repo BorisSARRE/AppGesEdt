@@ -46,4 +46,9 @@ public interface SbMapper {
     @InheritInverseConfiguration
     Indisponibilite maps(IndisponibiliteDto dto);
 
+    @Mappings({})
+    EnseignantDto maps(Enseignant entity);
+
+    @InheritInverseConfiguration
+    Enseignant maps(EnseignantDto dto);
 }

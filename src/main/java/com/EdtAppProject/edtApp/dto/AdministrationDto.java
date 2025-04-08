@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 
 public class AdministrationDto extends UtilisateurDto {
 
-    @NotBlank(message = "Le matricule est obligatoire")
+    //@NotBlank(message = "Le matricule est obligatoire")
     private String matricule;
 
-    @NotBlank(message = "Le type d'admin est obligatoire")
+    //@NotBlank(message = "Le type d'admin est obligatoire")
     private ETypeAdmin typeAdmin;
 }

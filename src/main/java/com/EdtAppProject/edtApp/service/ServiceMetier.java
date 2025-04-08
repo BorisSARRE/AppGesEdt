@@ -1,6 +1,7 @@
 package com.EdtAppProject.edtApp.service;
 
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
+import com.EdtAppProject.edtApp.dto.EnseignantDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
 import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
@@ -406,13 +407,27 @@ public class ServiceMetier {
      */
     public IndisponibiliteDto createIndisponibilite( IndisponibiliteDto indisponibiliteDto) {
         Enseignant enseignant = enseignantRepository.findById(indisponibiliteDto.getIdEnseignant())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: " + indisponibiliteDto.getIdEnseignant()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: "
+                        + indisponibiliteDto.getIdEnseignant()));
 
-        Indisponibilite indisponibilite = mapper.maps(indisponibiliteDto);
-        indisponibilite.setEnseignant(enseignant);
-        Indisponibilite savedIndisponibilite = indisponibiliteRepository.save(indisponibilite);
+        if (this.indisponibiliteRepository.existsByDateDebutAndDateFinAndEnseignantId(indisponibiliteDto.getDateDebut(),
+                indisponibiliteDto.getDateFin(),indisponibiliteDto.getIdEnseignant())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cet indisponibilité existe déjà pour cet enseignent");
 
-        return mapper.maps(savedIndisponibilite);
+        } else if (indisponibiliteDto.getDateDebut() != null && indisponibiliteDto.getDateFin() != null &&
+                indisponibiliteDto.getDateDebut().isAfter(indisponibiliteDto.getDateFin())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date de début doit être antérieure " +
+                    "à la date de fin" );
+        }else {
+
+            Indisponibilite indisponibilite = mapper.maps(indisponibiliteDto);
+            Indisponibilite savedIndisponibilite = indisponibiliteRepository.save(indisponibilite);
+            return mapper.maps(savedIndisponibilite);
+        }
+
+
+
+
     }
 
     /**
@@ -442,20 +457,34 @@ public class ServiceMetier {
      * @param indisponibiliteDto Les nouvelles informations de l'indisponibilité
      * @return IndisponibiliteDto
      */
-    public IndisponibiliteDto updateIndisponibilite( IndisponibiliteDto indisponibiliteDto) {
-        String id = indisponibiliteDto.getId();
-        Indisponibilite existingIndisponibilite = indisponibiliteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + id));
+    public IndisponibiliteDto updateIndisponibilite(final String idIndisponibilite, final IndisponibiliteDto indisponibiliteDto) {
+
+        Indisponibilite existingIndisponibilite = indisponibiliteRepository.findById(idIndisponibilite)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + idIndisponibilite));
 
         Enseignant enseignant = enseignantRepository.findById(indisponibiliteDto.getIdEnseignant())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: " + indisponibiliteDto.getIdEnseignant()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enseignant non trouvé avec l'Id: " +
+                        indisponibiliteDto.getIdEnseignant()));
 
-        Indisponibilite updatedIndisponibilite = mapper.maps(indisponibiliteDto);
-        updatedIndisponibilite.setId(id);
-        updatedIndisponibilite.setEnseignant(enseignant);
 
-        Indisponibilite savedIndisponibilite = indisponibiliteRepository.save(updatedIndisponibilite);
-        return mapper.maps(savedIndisponibilite);
+        if (this.indisponibiliteRepository.existsByDateDebutAndDateFinAndEnseignantId(indisponibiliteDto.getDateDebut(),
+                indisponibiliteDto.getDateFin(),indisponibiliteDto.getIdEnseignant())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cet indisponibilité existe déjà pour cet enseignent");
+
+        } else if (indisponibiliteDto.getDateDebut() != null && indisponibiliteDto.getDateFin() != null &&
+                indisponibiliteDto.getDateDebut().isAfter(indisponibiliteDto.getDateFin())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date de début doit être antérieure " +
+                    "à la date de fin" );
+        }else {
+            Indisponibilite updatedIndisponibilite = this.indisponibiliteRepository.getReferenceById(idIndisponibilite);
+
+            updatedIndisponibilite.setDateDebut(indisponibiliteDto.getDateDebut());
+            updatedIndisponibilite.setDateFin(indisponibiliteDto.getDateFin());
+            updatedIndisponibilite.setMotif(indisponibiliteDto.getMotif());
+            updatedIndisponibilite.setEnseignant(enseignantRepository.getReferenceById(indisponibiliteDto.getIdEnseignant()));
+            return mapper.maps(this.indisponibiliteRepository.save(updatedIndisponibilite));
+        }
+
     }
 
     /**
@@ -466,6 +495,15 @@ public class ServiceMetier {
         Indisponibilite indisponibilite = indisponibiliteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Indisponibilité non trouvée avec l'Id: " + id));
         indisponibiliteRepository.delete(indisponibilite);
+    }
+
+    /**
+     * creer des utilisateur ficifs pour les test.
+     */
+
+    public EnseignantDto creerEnseignant(EnseignantDto enseignantDto){
+        Enseignant enseignant = this.mapper.maps(enseignantDto);
+        return this.mapper.maps(this.enseignantRepository.save(enseignant));
     }
 
 }

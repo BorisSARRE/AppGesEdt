@@ -4,6 +4,7 @@ import com.EdtAppProject.edtApp.entite.Enum.ESexe;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCompte;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class UtilisateurDto {
     @NotBlank(message = "Le prenom est obligatoire")
     private String prenom;
 
-    @NotBlank(message = "Le sexe est obligatoire")
+    @NotNull(message = "Le sexe est obligatoire")
     private ESexe sexe;
 
     @Pattern(
