@@ -1,5 +1,6 @@
 package com.EdtAppProject.edtApp.entite;
 
+import com.EdtAppProject.edtApp.entite.Enum.ECrenau;
 import com.EdtAppProject.edtApp.entite.Enum.ESatutDevoir;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -29,7 +31,11 @@ public class Devoir {
     private String id;
 
     @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "crenau", nullable =false)
+    private ECrenau crenau;
 
     @Column(name = "duree", nullable = false)
     private float duree;

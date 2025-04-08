@@ -1,10 +1,11 @@
 package com.EdtAppProject.edtApp.dto;
 
-import com.EdtAppProject.edtApp.entite.Enum.ECrenaux;
+import com.EdtAppProject.edtApp.entite.Enum.ECrenau;
 import com.EdtAppProject.edtApp.entite.Enum.EDisponibiliteProf;
-import com.EdtAppProject.edtApp.entite.Enum.EJourSemaine;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCours;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,22 +22,23 @@ public class CoursDto {
 
     private String id;
 
-    @NonNull
+    @NotNull
     private LocalDate date;
 
-    @NotBlank(message = " Veuillez choisir un crénaux")
-    private ECrenaux crenaux;
+    @NotNull(message = " Veuillez choisir un crénaux")
+    private ECrenau crenau;
 
     private EStatutCours statutCours;
 
     private EDisponibiliteProf disponibiliteProf;
-
-    private EJourSemaine jourSemaine;
 
     @NotBlank(message = "Identifiant de la salle obligatoire !")
     private String idSalle;
 
     @NotBlank(message = "Identifiant du module obligatoire !")
     private String idMatiere;
+
+    @NotBlank(message = "Identifiant de l'emploi du temps obligatoire !")
+    private String idEmploiDuTemps;
 
 }

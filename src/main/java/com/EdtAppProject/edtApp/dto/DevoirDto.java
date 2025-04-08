@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,7 +21,7 @@ public class DevoirDto {
     private String id;
 
     @NotNull
-    private LocalDateTime date;
+    private LocalDate date;
 
     @NotNull
     private float duree;

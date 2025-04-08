@@ -1,8 +1,7 @@
 package com.EdtAppProject.edtApp.entite;
 
-import com.EdtAppProject.edtApp.entite.Enum.ECrenaux;
+import com.EdtAppProject.edtApp.entite.Enum.ECrenau;
 import com.EdtAppProject.edtApp.entite.Enum.EDisponibiliteProf;
-import com.EdtAppProject.edtApp.entite.Enum.EJourSemaine;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCours;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,8 +34,8 @@ public class Cours {
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "crenaux", nullable = false)
-    private ECrenaux crenaux;
+    @Column(name = "crenau", nullable = false)
+    private ECrenau crenau;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statutCours")
@@ -47,17 +46,17 @@ public class Cours {
     private EDisponibiliteProf disponibiliteProf;
 
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "jourSemaine")
-    private EJourSemaine jourSemaine;
-
     @ManyToOne
-    @JoinColumn(name = "salle_id")
+    @JoinColumn(name = "salle_id", nullable = false)
     private Salle salle;
 
     @ManyToOne
-    @JoinColumn(name = "module_id")
+    @JoinColumn(name = "module_id", nullable = false)
     private Matiere matiere;
+
+    @ManyToOne
+    @JoinColumn(name = "emploiDuTemps_id", nullable = false)
+    private EmploiDuTemps emploiDuTemps;
 
 
 }

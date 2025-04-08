@@ -1,5 +1,6 @@
 package com.EdtAppProject.edtApp.controller;
 
+import com.EdtAppProject.edtApp.dto.CoursDto;
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.EnseignantDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
@@ -214,7 +215,7 @@ public class AppController {
     }
 
     /**
-     * *************** Endpoint utilisateur
+     * *************** Endpoint utilisateur ********************
      */
     @PostMapping("/enseignant")
     public ResponseEntity<EnseignantDto> createEnseignant(@Valid @RequestBody final EnseignantDto enseignantDto) {
@@ -222,4 +223,47 @@ public class AppController {
         return new ResponseEntity<>(enseignant, HttpStatus.CREATED);
     }
 
+    /**
+     ********************* Endpoints Cours ********************
+     */
+
+    @PostMapping("/cours")
+    public ResponseEntity<CoursDto> creerCours(@RequestBody @Valid final CoursDto coursDto) {
+        return new ResponseEntity<>(this.serviceMetier.creerCours(coursDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/cours/{id}")
+    public ResponseEntity<CoursDto> modifierCours(@PathVariable("id") final String idCours,
+                                                                    @Valid @RequestBody final CoursDto coursDto) {
+        CoursDto cours = serviceMetier.modifierCours(idCours, coursDto);
+        return new ResponseEntity<>(cours, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/cours/{id}")
+    public ResponseEntity<Void> supprimerCours(@PathVariable("id") final String idCours) {
+        serviceMetier.supprimerCours(idCours);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/cours/{id1}/{id2}")
+    public ResponseEntity<List<CoursDto>> listerCoursParEmploiDuTempsEtFiliere(@PathVariable("id1") final String idEmploiDuTemps,
+                                                                               @PathVariable("id2") final String idFiliere) {
+        List<CoursDto> coursDtos = serviceMetier.listerCoursParEmploiDuTempsEtFiliere(idEmploiDuTemps, idFiliere);
+        return new ResponseEntity<>(coursDtos, HttpStatus.OK);
+    }
+
+    @PatchMapping("/cours1/{id}")
+    public ResponseEntity<CoursDto> changerStatutACoursFait(@PathVariable("id") final String idCours) {
+        return new ResponseEntity<>(this.serviceMetier.changerStatutACoursFait(idCours), HttpStatus.OK);
+    }
+
+    @PatchMapping("/cours2/{id}")
+    public ResponseEntity<Void> marquerIndisponibilite(@PathVariable("id") final String idCour) {
+        this.serviceMetier.marquerIndisponibilite(idCour);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     ************** Gestion des devoirs *************************
+     */
 }
