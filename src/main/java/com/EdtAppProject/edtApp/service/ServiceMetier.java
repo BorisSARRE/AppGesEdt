@@ -322,6 +322,79 @@ public class ServiceMetier {
         return resultat;
     }
 
+
+    /**
+     * Modifier un module.
+     * @param idMatiere
+     * @param matiereDto
+     * @return MatiereDto
+     */
+    public MatiereDto modifierMatiere(final String idMatiere, final MatiereDto matiereDto){
+
+        Optional<Matiere> matiere = matiereRepository.findById(idMatiere);
+        String intituleNettoye = nettoyerChaineDeCaharactere(matiereDto.getIntitule());
+
+        if (matiere.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ce module n'existe pas");
+        }else {
+
+            if (matiereRepository.existsByIntituleAndFiliereId(intituleNettoye, matiereDto.getIdFiliere())) {
+                String nomFiliere = filiereRepository.findById(matiereDto.getIdFiliere())
+                        .map(Filiere::getNomFiliere)
+                        .orElse("inconnue");
+
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Ce Module existe déjà pour la filière " + nomFiliere);
+            } else {
+                List<MatiereDto> matiereDtos = matiere.stream().map(c->{
+                    c.setIntitule(intituleNettoye);
+                    c.setVolumeHoraire(matiereDto.getVolumeHoraire());
+                    c.setStatutMatiere(matiereDto.getStatutMatiere());
+                    c.setSemestre(matiereDto.getSemestre());
+                    c.setFiliere(this.filiereRepository.getReferenceById(matiereDto.getIdFiliere()));
+                    return this.mapper.maps(this.matiereRepository.save(c));
+
+                }).toList();
+            }
+
+        }
+
+        return matiereDto;
+    }
+
+    /**
+     * Supprimer une matiere.
+     * @param idMatiere
+     * @return ResponseStatusException
+     */
+    public ResponseStatusException supprimerMatiere(final String idMatiere){
+
+        Optional<Matiere> matiere = matiereRepository.findById(idMatiere);
+        if (matiere.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ce module n'existe pas");
+        }else{
+            this.matiereRepository.deleteById(idMatiere);
+            return new ResponseStatusException(HttpStatus.OK);
+        }
+    }
+
+    /**
+     * Lister les matieres par filière.
+     * @param idFiliere
+     * @return List<MatiereDto>
+     */
+    public List<MatiereDto> listMatiereParFiliere(final String idFiliere){
+
+        if (! filiereRepository.existsById(idFiliere)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas");
+        }else{
+            List<Matiere> matiereDtos = this.matiereRepository.findByFiliereId(idFiliere);
+            return matiereDtos.stream().map(this.mapper::maps).toList();
+        }
+    }
+
+
+
     /**
      * ******************** Gestion des Indisponibilites ******************
      */

@@ -6,6 +6,7 @@ import com.EdtAppProject.edtApp.dto.IndisponibiliteDto;
 import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
+import com.EdtAppProject.edtApp.entite.Matiere;
 import com.EdtAppProject.edtApp.service.ServiceMetier;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -132,6 +133,23 @@ public class AppController {
         return new ResponseEntity<>(this.serviceMetier.creerMatiere(matiereDto), HttpStatus.CREATED);
     }
 
+    @PutMapping("/matiere/{id}")
+    public ResponseEntity<MatiereDto> modifierMatiere(@PathVariable("id") final String idMatiere,
+                                                   @RequestBody @Valid final MatiereDto matiereDto) {
+        return new ResponseEntity<>(this.serviceMetier.modifierMatiere(idMatiere, matiereDto), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/matiere/{id}")
+    public ResponseEntity<Void> supprimerMatiere(@PathVariable("id") final String idMatiere) {
+        serviceMetier.supprimerMatiere(idMatiere);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/matiere/{id}")
+    public ResponseEntity<List<MatiereDto>> listMatiereParFiliere(@PathVariable("id") final String idFiliere) {
+        return new ResponseEntity<>(serviceMetier.listMatiereParFiliere(idFiliere), HttpStatus.OK);
+    }
+
     /**
      * ***************** Endpoints Indisponibilites **************
      */
@@ -143,10 +161,11 @@ public class AppController {
      */
 
     @PostMapping("/indisponibilites")
-    public ResponseEntity<IndisponibiliteDto> createIndisponibilite(@Valid @RequestBody IndisponibiliteDto indisponibiliteDto) {
+    public ResponseEntity<IndisponibiliteDto> createIndisponibilite(@Valid @RequestBody final IndisponibiliteDto indisponibiliteDto) {
         IndisponibiliteDto createdDto = serviceMetier.createIndisponibilite(indisponibiliteDto);
         return new ResponseEntity<>(createdDto, HttpStatus.CREATED);
     }
+
 
     /**
      * Récupérer une indisponibilité par son ID.
@@ -154,7 +173,7 @@ public class AppController {
      * @return ResponseEntity<IndisponibiliteDto>
      */
     @GetMapping("/indisponibilites/{id}")
-    public ResponseEntity<IndisponibiliteDto> getIndisponibiliteById(@PathVariable String id) {
+    public ResponseEntity<IndisponibiliteDto> getIndisponibiliteById(@PathVariable("id") final String id) {
         IndisponibiliteDto dto = serviceMetier.getIndisponibiliteById(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
@@ -175,7 +194,7 @@ public class AppController {
      * @return ResponseEntity<IndisponibiliteDto>
      */
     @PutMapping("/indisponibilites")
-    public ResponseEntity<IndisponibiliteDto> updateIndisponibilite(@Valid @RequestBody IndisponibiliteDto indisponibiliteDto) {
+    public ResponseEntity<IndisponibiliteDto> updateIndisponibilite(@Valid @RequestBody final IndisponibiliteDto indisponibiliteDto) {
         IndisponibiliteDto updatedDto = serviceMetier.updateIndisponibilite(indisponibiliteDto);
         return new ResponseEntity<>(updatedDto, HttpStatus.OK);
     }
@@ -186,7 +205,7 @@ public class AppController {
      * @return ResponseEntity<Void>
      */
     @DeleteMapping("/indisponibilites/{id}")
-    public ResponseEntity<Void> deleteIndisponibilite(@PathVariable String id) {
+    public ResponseEntity<Void> deleteIndisponibilite(@PathVariable("id") final String id) {
         serviceMetier.deleteIndisponibilite(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
