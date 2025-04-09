@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface CoursRepository extends JpaRepository<Cours,String> {
 
+    boolean existsByDateAndCrenau(LocalDate date, ECrenau crenau);
     boolean existsByDateAndCrenauAndMatiereId(LocalDate date, ECrenau crenau, String idMatiere);
     boolean existsByDateAndCrenauAndSalleId(LocalDate date, ECrenau crenau, String idSalle);
     List<Cours> findByEmploiDuTempsIdAndMatiereFiliereId(String idEmploiDuTemps, String idFiliere);

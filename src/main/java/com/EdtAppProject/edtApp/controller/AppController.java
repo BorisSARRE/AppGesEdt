@@ -1,6 +1,7 @@
 package com.EdtAppProject.edtApp.controller;
 
 import com.EdtAppProject.edtApp.dto.CoursDto;
+import com.EdtAppProject.edtApp.dto.DevoirDto;
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.EnseignantDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
@@ -264,6 +265,37 @@ public class AppController {
     }
 
     /**
-     ************** Gestion des devoirs *************************
+     ************** Endpoint des devoirs *************************
      */
+
+    @PostMapping("/devoir")
+    public ResponseEntity<DevoirDto> creerDevoir(@RequestBody @Valid final DevoirDto devoirDto) {
+        return new ResponseEntity<>(this.serviceMetier.creerDevoir(devoirDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/devoir/{id}")
+    public ResponseEntity<DevoirDto> modifierDevoir(@PathVariable("id") final String idDevoir,
+                                                  @Valid @RequestBody final DevoirDto devoirDto) {
+        DevoirDto dto = serviceMetier.modifierDevoir(idDevoir, devoirDto);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/devoir/{id}")
+    public ResponseEntity<Void> supprimerDevoir(@PathVariable("id") final String idDevoir) {
+        serviceMetier.supprimerDevoir(idDevoir);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/devoir/{id1}/{id2}")
+    public ResponseEntity<List<DevoirDto>> listerDevoirParEmploiDuTempsEtFiliere(@PathVariable("id1") final String idEmploiDuTemps,
+                                                                               @PathVariable("id2") final String idFiliere) {
+        List<DevoirDto> devoirDtos = serviceMetier.listerDevoirParEmploiDuTempsEtFiliere(idEmploiDuTemps, idFiliere);
+        return new ResponseEntity<>(devoirDtos, HttpStatus.OK);
+    }
+
+    @PatchMapping("/devoir/{id}")
+    public ResponseEntity<DevoirDto> annulerDevoir(@PathVariable("id") final String idDevoir) {
+        return new ResponseEntity<>(this.serviceMetier.annulerDevoir(idDevoir), HttpStatus.OK);
+    }
+
 }

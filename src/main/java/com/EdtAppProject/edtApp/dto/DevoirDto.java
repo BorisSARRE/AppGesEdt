@@ -1,6 +1,7 @@
 package com.EdtAppProject.edtApp.dto;
 
 
+import com.EdtAppProject.edtApp.entite.Enum.ECrenau;
 import com.EdtAppProject.edtApp.entite.Enum.ESatutDevoir;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,9 @@ public class DevoirDto {
 
     @NotNull
     private LocalDate date;
+
+    @NotNull(message = " Veuillez choisir un crénaux")
+    private ECrenau crenau;
 
     @NotNull
     private float duree;

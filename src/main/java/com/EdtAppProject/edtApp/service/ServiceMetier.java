@@ -1,6 +1,7 @@
 package com.EdtAppProject.edtApp.service;
 
 import com.EdtAppProject.edtApp.dto.CoursDto;
+import com.EdtAppProject.edtApp.dto.DevoirDto;
 import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
 import com.EdtAppProject.edtApp.dto.EnseignantDto;
 import com.EdtAppProject.edtApp.dto.FiliereDto;
@@ -8,9 +9,11 @@ import com.EdtAppProject.edtApp.dto.IndisponibiliteDto;
 import com.EdtAppProject.edtApp.dto.MatiereDto;
 import com.EdtAppProject.edtApp.dto.SalleDto;
 import com.EdtAppProject.edtApp.entite.Cours;
+import com.EdtAppProject.edtApp.entite.Devoir;
 import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
 import com.EdtAppProject.edtApp.entite.Enseignant;
 import com.EdtAppProject.edtApp.entite.Enum.EDisponibiliteProf;
+import com.EdtAppProject.edtApp.entite.Enum.ESatutDevoir;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCours;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutMatiere;
@@ -691,5 +694,133 @@ public class ServiceMetier {
 
     }
 
+    /**
+     *************** Gestions des devoirs ***********************
+     */
+
+    public DevoirDto creerDevoir(DevoirDto devoirDto){
+
+        if (this.devoirRepository.existsByDateAndCrenauAndDureeAndMatiereId(devoirDto.getDate(), devoirDto.getCrenau(),
+                devoirDto.getDuree() ,devoirDto.getIdMatiere())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ce devoir est déjà programmé pour le " + devoirDto.getDate() + " pour " + devoirDto.getCrenau().getPlageHoraire());
+
+        } else if (this.devoirRepository.existsByDateAndCrenauAndSalleId(devoirDto.getDate(), devoirDto.getCrenau(),
+                devoirDto.getIdSalle())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Salle déjà occupée. Veuillez changer de salle !");
+
+        } else if (this.coursRepository.existsByDateAndCrenau(devoirDto.getDate(), devoirDto.getCrenau())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Un Cours est déjà programmé pour le " + devoirDto.getDate() + " pour " + devoirDto.getCrenau().getPlageHoraire());
+
+        } else {
+            EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(devoirDto.getIdEmploiDuTemps());
+            if (devoirDto.getDate().isBefore(emploiDuTemps.getDateDebut()) ||
+                    devoirDto.getDate().isAfter(emploiDuTemps.getDateFin())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "La date du devoir n'est pas comprise dans l'emploi du temps correspondant");
+            } else {
+                Devoir devoir = this.mapper.maps(devoirDto);
+                devoir.setStatutDevoir(ESatutDevoir.NON_FAIT);
+                return this.mapper.maps(this.devoirRepository.save(devoir));
+            }
+        }
+
+    }
+
+    /**
+     * Créer un devoir.
+     * @param idDevoir
+     * @param devoirDto
+     * @return DevoirDto
+     */
+    public DevoirDto modifierDevoir(String idDevoir, DevoirDto devoirDto){
+
+        Devoir devoir = this.devoirRepository.findById(idDevoir)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cours non trouvé"));
+
+        if (this.devoirRepository.existsByDateAndCrenauAndDureeAndMatiereId(devoirDto.getDate(), devoirDto.getCrenau(),
+                devoirDto.getDuree(), devoirDto.getIdMatiere())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ce devoir est déjà programmé pour le " + devoirDto.getDate() + " pour " + devoirDto.getCrenau().getPlageHoraire());
+
+        } else if (this.devoirRepository.existsByDateAndCrenauAndSalleId(devoirDto.getDate(), devoirDto.getCrenau(),
+                devoirDto.getIdSalle())) {
+            devoir.setDuree(devoirDto.getDuree());
+            this.devoirRepository.save(devoir);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Salle déjà occupée pour un devoir. Veuillez changer de salle. Cependant la durée du devoir a été mise à jour !");
+
+
+        } else if (this.coursRepository.existsByDateAndCrenau(devoirDto.getDate(), devoirDto.getCrenau())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Un Cours est déjà programmé pour le " + devoirDto.getDate() + " pour " + devoirDto.getCrenau().getPlageHoraire());
+
+        } else {
+            EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(devoirDto.getIdEmploiDuTemps());
+
+            if (devoirDto.getDate().isBefore(emploiDuTemps.getDateDebut()) ||
+                    devoirDto.getDate().isAfter(emploiDuTemps.getDateFin())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "La date du devoir n'est pas comprise dans l'emploi du temps correspondant");
+            } else {
+                devoir.setDate(devoirDto.getDate());
+                devoir.setCrenau(devoirDto.getCrenau());
+                devoir.setId(idDevoir);
+                devoir.setDuree(devoirDto.getDuree());
+                devoir.setMatiere(this.matiereRepository.getReferenceById(devoirDto.getIdMatiere()));
+                devoir.setEmploiDuTemps(this.emploiDuTempsRepository.getReferenceById(devoirDto.getIdEmploiDuTemps()));
+                devoir.setStatutDevoir(ESatutDevoir.NON_FAIT);
+
+                return this.mapper.maps(this.devoirRepository.save(devoir));
+            }
+        }
+
+    }
+
+    /**
+     * Supprimer devoir.
+     * @param idDevoir
+     * @return ResponseStatusException
+     */
+    public ResponseStatusException supprimerDevoir(final String idDevoir) {
+
+        Optional<Devoir> devoir = devoirRepository.findById(idDevoir);
+        if (devoir.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ce module n'existe pas");
+        } else {
+            this.devoirRepository.deleteById(idDevoir);
+            return new ResponseStatusException(HttpStatus.OK);
+        }
+    }
+
+    /**
+     * Lister les devoirs par emploi du temps.
+     * @param idEmploiDuTemps
+     * @param idFiliere
+     * @return List<CoursDto>
+     */
+    public List<DevoirDto> listerDevoirParEmploiDuTempsEtFiliere(String idEmploiDuTemps, String idFiliere) {
+
+        List<Devoir> devoirList = this.devoirRepository.findByEmploiDuTempsIdAndMatiereFiliereId(idEmploiDuTemps, idFiliere);
+
+        return devoirList.stream().map(this.mapper::maps).toList();
+    }
+
+    /**
+     * Annuler devoir.
+     * @param idDevoir
+     * @return DevoirDto
+     */
+    public DevoirDto annulerDevoir(final String idDevoir) {
+
+        Devoir devoir = this.devoirRepository.findById(idDevoir)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cours non trouvé"));
+
+        devoir.setStatutDevoir(ESatutDevoir.ANNULE);
+        return this.mapper.maps(this.devoirRepository.save(devoir));
+
+    }
 
 }

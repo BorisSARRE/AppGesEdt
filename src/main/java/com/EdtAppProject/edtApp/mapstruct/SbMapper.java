@@ -62,4 +62,14 @@ public interface SbMapper {
     @InheritInverseConfiguration
     Cours maps(CoursDto dto);
 
+    @Mappings({
+            @Mapping(target = "idSalle", source = "salle.id"),
+            @Mapping(target = "idMatiere", source = "matiere.id"),
+            @Mapping(target = "idEmploiDuTemps", source = "emploiDuTemps.id")
+    })
+    DevoirDto maps(Devoir entity);
+
+    @InheritInverseConfiguration
+    Devoir maps(DevoirDto dto);
+
 }

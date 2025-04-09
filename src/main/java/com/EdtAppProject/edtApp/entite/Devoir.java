@@ -50,7 +50,7 @@ public class Devoir {
 
     @ManyToOne
     @JoinColumn(name = "module_id")
-    private Matiere module;
+    private Matiere matiere;
 
     @ManyToOne
     @JoinColumn(name = "emploiDuTemps_id")
