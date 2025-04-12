@@ -50,11 +50,16 @@ public class Matiere {
     @JoinColumn(name = "filiere")
     private Filiere filiere;
 
-    @ManyToMany
-    @JoinTable(name = "matiere_enseignant",
-            joinColumns = @JoinColumn(name = "matiere_id"),
-            inverseJoinColumns = @JoinColumn(name = "enseignant_id"))
+    @ManyToOne
+    @JoinColumn(name = "enseignant")
+    private Enseignant enseignant;
 
-    private List<Enseignant> enseignants = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "matiere_enseignant",
+//            joinColumns = @JoinColumn(name = "matiere_id"),
+//            inverseJoinColumns = @JoinColumn(name = "enseignant_id"))
+//
+//    private List<Enseignant> enseignants = new ArrayList<>();
 
 }

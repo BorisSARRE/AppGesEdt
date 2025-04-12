@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@DiscriminatorValue("PARENT")
+@DiscriminatorValue("PARENT")
 public class Parent extends Utilisateur {
 
     @Enumerated(EnumType.STRING)
