@@ -317,6 +317,8 @@ public class ServiceMetier {
      ****************** Gestion des matieres ************************
      */
 
+
+
     /**
      * Créer une matiere.
      *
@@ -426,6 +428,19 @@ public class ServiceMetier {
             List<Matiere> matiereDtos = this.matiereRepository.findByFiliereId(idFiliere);
             return matiereDtos.stream().map(this.mapper::maps).toList();
         }
+    }
+
+    /**
+     * Lister tous les modules
+     *
+     * @return List<MatiereDto>
+     */
+
+    public List<MatiereDto> listAllMatieres(){
+        List<Matiere> matieres = matiereRepository.findAll();
+        return matieres.stream()
+                .map(mapper::maps)
+                .collect(Collectors.toList());
     }
 
 

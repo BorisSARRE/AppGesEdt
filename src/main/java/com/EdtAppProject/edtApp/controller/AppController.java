@@ -35,6 +35,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/api")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class AppController {
 
     private final ServiceMetier serviceMetier;
@@ -151,6 +152,11 @@ public class AppController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MatiereDto> creerMatiere(@RequestBody @Valid final MatiereDto matiereDto) {
         return new ResponseEntity<>(this.serviceMetier.creerMatiere(matiereDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/matiere")
+    public ResponseEntity<List<MatiereDto>> getAllMatieres(){
+        return new ResponseEntity<>(serviceMetier.listAllMatieres(),HttpStatus.OK);
     }
 
     @PutMapping("/matiere/{id}")
