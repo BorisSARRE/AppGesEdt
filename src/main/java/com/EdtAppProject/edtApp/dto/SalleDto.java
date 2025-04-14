@@ -17,7 +17,7 @@ public class SalleDto {
     private String id;
 
     @NotBlank(message = "Numéro de salle obligatoire !")
-    @Pattern(regexp = "^[A-D]\\d{2}$", message = "Le numéro de salle doit commencer par A, B, C ou D suivi de deux chiffres")
+    @Pattern(regexp = "^[A-D]\\d{1,2}$", message = "Le numéro de salle doit commencer par A, B, C ou D suivi de deux chiffres")
     private String numeroSalle;
 
     private EDisponibiliteSalle disponibiliteSalle;

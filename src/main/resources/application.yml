@@ -1,10 +1,13 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:80/edt
-    #jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.fpertihcwgplxkmdnnxj&password=OSKO123401020304
-    username: postgres
-    password: mysecretpassword
+    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.fpertihcwgplxkmdnnxj&password=OSKO1234010203044
+#    hikari:
+#      maximum-pool-size: 5
+#      minimum-idle: 1
+#      idle-timeout: 30000
+#      max-lifetime: 1800000
+#      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,6 +17,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 debug: true
-
+app:
+  jwt:
+    secret: 1JQ41pmACOW1SKotMz03NIQ1DV3e757lCaPE5ZGE7II3kR8Dp30E1cMoQokqbxQt
+    expiration: 3600000
+    refresh-expiration: 86400000
 server:
   port: 8086
