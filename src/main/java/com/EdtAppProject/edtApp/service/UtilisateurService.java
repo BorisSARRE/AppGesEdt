@@ -99,12 +99,6 @@ public class UtilisateurService {
         utilisateur.setPassword(passwordEncoder.encode(request.getNewPassword()));
         utilisateurRepository.save(utilisateur);
 
-        // Invalider tous les tokens existants
-//        if (request.isInvalidateAllSessions()) {
-//            tokenBlacklistService.blacklistToken(request.getCurrentToken(),
-//                    jwtService.getExpirationDate(request.getCurrentToken()));
-//        }
-
         return ChangePasswordResponse.builder()
                 .message("Mot de passe modifié avec succès")
                 .emailUtilisateur(email)
@@ -143,5 +137,41 @@ public class UtilisateurService {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalide");
         }
+    }
+
+
+    @Transactional
+    public ChangePasswordResponse changePassword(String token, ChangePasswordRequest request) {
+        // Extraire l'email du token pour identifier l'utilisateur
+        String email = jwtService.extractUsername(token);
+
+        // Récupérer l'utilisateur
+        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+
+        // Vérifier l'ancien mot de passe
+        if (!passwordEncoder.matches(request.getOldPassword(), utilisateur.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ancien mot de passe incorrect");
+        }
+
+        // Vérifier que le nouveau mot de passe est différent de l'ancien
+        if (passwordEncoder.matches(request.getNewPassword(), utilisateur.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Le nouveau mot de passe doit être différent de l'ancien");
+        }
+
+        // Changer le mot de passe
+        utilisateur.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        utilisateurRepository.save(utilisateur);
+
+        // Ajouter le token à la liste noire (optionnel pour forcer une reconnexion)
+        Date expirationDate = jwtService.getExpirationDate(token);
+        tokenBlacklistService.blacklistToken(token, expirationDate);
+
+        return ChangePasswordResponse.builder()
+                .message("Mot de passe modifié avec succès")
+                .emailUtilisateur(email)
+                .success(true)
+                .build();
     }
 }

@@ -133,22 +133,7 @@ public class AuthService {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rôle invalide");
         }
 
-        // Configuration commune
-//        utilisateur.setNom(request.getNom());
-//        utilisateur.setPrenom(request.getPrenom());
-//        utilisateur.setSexe(request.getSexe());
-//        utilisateur.setTelephone(request.getTelephone());
-//        utilisateur.setEmail(request.getEmail());
-//        utilisateur.setPassword(passwordEncoder.encode(request.getPassword()));
-//        utilisateur.setRole(request.getRole());
 
-        // Par défaut, les comptes sont en attente sauf pour l'admin
-//        if (request.getRole() == ERole.ADMIN) {
-//            utilisateur.setStatutCompte(EStatutCompte.ACTIF);
-//        } else {
-//            utilisateur.setStatutCompte(EStatutCompte.EN_ATTENTE);
-//        }
-//
     }
 
     public AuthResponse authenticate(LoginRequest request) {
@@ -206,33 +191,4 @@ public class AuthService {
         }
     }
 
-//    public LogoutResponse logout(LogoutRequest request) {
-//        String token = request.getToken();
-//
-//        // Vérifier si le token est valide avant de le mettre en liste noire
-//        if (token == null || token.isEmpty()) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token non fourni");
-//        }
-//
-//        try {
-//            // Extraire l'email pour identifier l'utilisateur
-//            String email = jwtService.extractUsername(token);
-//
-//            // Vérifier si l'utilisateur existe
-//            Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
-//
-//            // Ajouter le token à la liste noire
-//            tokenBlacklistService.blacklistToken(token, jwtService.getExpirationDate(token));
-//
-//            return LogoutResponse.builder()
-//                    .message("Déconnexion réussie")
-//                    .utilisateurEmail(email)
-//                    .success(true)
-//                    .build();
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-//                    "Erreur lors de la déconnexion: " + e.getMessage());
-//        }
-//    }
 }
