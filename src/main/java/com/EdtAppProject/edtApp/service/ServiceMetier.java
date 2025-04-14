@@ -148,7 +148,8 @@ public class ServiceMetier {
      * @return FiliereDto
      */
     public FiliereDto modifierFiliere(final String idFiliere, final FiliereDto filiereDto) {
-        if (filiereRepository.existsByNomFiliereAndNiveau(filiereDto.getNomFiliere(), filiereDto.getNiveau())) {
+        if (filiereRepository.existsByNomFiliereAndNiveauAndDescription(filiereDto.getNomFiliere(), filiereDto.getNiveau(),
+                filiereDto.getDescription())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La filiere existe déjà !");
         } else {
             Filiere filiere = this.filiereRepository.getReferenceById(idFiliere);

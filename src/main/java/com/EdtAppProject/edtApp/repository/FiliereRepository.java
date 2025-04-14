@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface FiliereRepository extends JpaRepository<Filiere, String> {
 
     boolean existsByNomFiliereAndNiveau(String nomFiliere, ENiveau niveau);
+    boolean existsByNomFiliereAndNiveauAndDescription(String nomFiliere, ENiveau niveau, String description);
+
 }

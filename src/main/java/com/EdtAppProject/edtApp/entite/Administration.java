@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-//@DiscriminatorValue("ADMINISTRATION")
+@DiscriminatorValue("ADMINISTRATION")
 public class Administration extends Utilisateur {
 
     @Column(name = "matricule")

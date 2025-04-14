@@ -18,14 +18,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@DiscriminatorValue("ETUDIANT")
+@DiscriminatorValue("ETUDIANT")
 public class Etudiant extends Utilisateur {
 
-    @Column(name = "ine", nullable = false)
+    @Column(name = "ine")
     private String ine;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "titreEtudiant", nullable = false)
+    @Column(name = "titreEtudiant")
     private ETitreEtudiant titreEtudiant;
 
     @ManyToOne
