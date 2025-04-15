@@ -44,7 +44,6 @@ public class AppController {
      */
 
     @PostMapping("/salle")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SalleDto> creerSalle(@RequestBody @Valid final SalleDto salleDto) {
         return new ResponseEntity<>(this.serviceMetier.creerSalle(salleDto), HttpStatus.CREATED);
     }
@@ -197,7 +196,7 @@ public class AppController {
      * @return ResponseEntity<IndisponibiliteDto>
      */
     @GetMapping("/indisponibilites/{id}")
-    @PreAuthorize("hasRole('ADMIN', 'ENSEIGNANT')")
+    @PreAuthorize("hasRole('ENSEIGNANT')")
     public ResponseEntity<IndisponibiliteDto> getIndisponibiliteById(@PathVariable("id") final String id) {
         IndisponibiliteDto dto = serviceMetier.getIndisponibiliteById(id);
         return new ResponseEntity<>(dto, HttpStatus.OK);
@@ -208,7 +207,7 @@ public class AppController {
      * @return ResponseEntity<List<IndisponibiliteDto>>
      */
     @GetMapping("/indisponibilites")
-    @PreAuthorize("hasRole('ADMIN' ,'ENSEIGNANT')")
+    @PreAuthorize("hasRole('ENSEIGNANT')")
     public ResponseEntity<List<IndisponibiliteDto>> getAllIndisponibilites() {
         List<IndisponibiliteDto> dtos = serviceMetier.getAllIndisponibilites();
         return new ResponseEntity<>(dtos, HttpStatus.OK);
@@ -239,14 +238,6 @@ public class AppController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    /**
-     * *************** Endpoint utilisateur ********************
-     */
-    @PostMapping("/enseignant")
-    public ResponseEntity<EnseignantDto> createEnseignant(@Valid @RequestBody final EnseignantDto enseignantDto) {
-        EnseignantDto enseignant = serviceMetier.creerEnseignant(enseignantDto);
-        return new ResponseEntity<>(enseignant, HttpStatus.CREATED);
-    }
 
     /**
      ********************* Endpoints Cours ********************

@@ -44,32 +44,8 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT', 'ETUDIANT', 'PARENT')")
-    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestBody ChangePasswordRequest request) {
-        return new  ResponseEntity<>(utilisateurService.changePassword(request),HttpStatus.OK);
+    public ResponseEntity<ChangePasswordResponse> changePassword(@RequestBody ChangePasswordRequest request,
+                                                                 HttpServletRequest httpServletRequest) {
+        return new  ResponseEntity<>(utilisateurService.changePassword(request, httpServletRequest),HttpStatus.OK);
     }
-
-//    @PostMapping("/change-password")
-//    public ResponseEntity<ChangePasswordResponse> changePassword(
-//            HttpServletRequest request,
-//            @RequestBody ChangePasswordRequest changePasswordRequest) {
-//
-//        String authHeader = request.getHeader("Authorization");
-//
-//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token d'authentification requis");
-//        }
-//
-//        String token = authHeader.substring(7);
-//
-//        try {
-//            ChangePasswordResponse response = utilisateurService.changePassword(token, changePasswordRequest);
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(
-//                    HttpStatus.BAD_REQUEST,
-//                    e.getMessage() != null ? e.getMessage() : "Une erreur est survenue lors du changement de mot de passe"
-//            );
-//        }
-//    }
 }

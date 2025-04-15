@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -30,10 +32,15 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/enseignants/**").hasRole("ENSEIGNANT")
-                        .requestMatchers("/api/etudiants/**").hasRole("ETUDIANT")
-                        .requestMatchers("/api/parents/**").hasRole("PARENT")
+                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/salle/**").hasRole("ADMIN")
+                        .requestMatchers("/api/filiere/**").hasRole("ADMIN")
+                        .requestMatchers("/api/matiere/**").hasRole("ADMIN")
+                        .requestMatchers("/api/indisponibilites/**").hasRole("ENSEIGNANT")
+                        .requestMatchers("/api/cours/**").hasRole("ADMIN")
+                        .requestMatchers("/api/devoir/**").hasRole("ADMIN")
+                        .requestMatchers("/api/edt/**").hasAnyRole("ADMIN", "ENSEIGNANT")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

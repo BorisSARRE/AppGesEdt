@@ -8,7 +8,9 @@ import com.EdtAppProject.edtApp.dto.ProfileUpdateRequest;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCompte;
 import com.EdtAppProject.edtApp.entite.Utilisateur;
 import com.EdtAppProject.edtApp.repository.UtilisateurRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,41 +72,63 @@ public class UtilisateurService {
         return utilisateurRepository.save(utilisateur);
     }
 
-    /**
-     * Change le mot de passe d'un utilisateur après vérification de l'ancien mot de passe
-     * @param request Contient l'ancien mot de passe, le nouveau mot de passe et le token actuel
-     * @return Réponse confirmant le changement de mot de passe
-     */
     @Transactional
-    public ChangePasswordResponse changePassword(ChangePasswordRequest request) {
+    public ChangePasswordResponse changePassword(ChangePasswordRequest request, HttpServletRequest httpRequest) {
+
+        // Extraire le token du header Authorization
+        String authHeader = httpRequest.getHeader("Authorization");
+
+        if (authHeader == null || authHeader.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Header Authorization manquant");
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Format du token invalide (doit commencer par 'Bearer ')");
+        }
+
+        String token = authHeader.substring(7);
+
+        if (token.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token vide");
+        }
+
+        // Vérifier si le token est présent
+        if (token == null || token.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token d'authentification manquant");
+        }
+
+
         // Extraire l'email du token pour identifier l'utilisateur
-        String email = jwtService.extractUsername(request.getCurrentToken());
+        try {
+            String email = jwtService.extractUsername(token);
 
-        // Récupérer l'utilisateur
-        Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+            // Récupérer l'utilisateur
+            Utilisateur utilisateur = utilisateurRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
 
-        // Vérifier l'ancien mot de passe
-        if (!passwordEncoder.matches(request.getOldPassword(), utilisateur.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ancien mot de passe incorrect");
+            // Vérifier l'ancien mot de passe
+            if (!passwordEncoder.matches(request.getOldPassword(), utilisateur.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ancien mot de passe incorrect");
+            }
+
+            // Vérifier que le nouveau mot de passe est différent de l'ancien
+            if (passwordEncoder.matches(request.getNewPassword(), utilisateur.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Le nouveau mot de passe doit être différent de l'ancien");
+            }
+
+            // Changer le mot de passe
+            utilisateur.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            utilisateurRepository.save(utilisateur);
+
+            return ChangePasswordResponse.builder()
+                    .message("Mot de passe modifié avec succès")
+                    .emailUtilisateur(email)
+                    .success(true)
+                    .build();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalide ou expiré");
         }
-
-        // Vérifier que le nouveau mot de passe est différent de l'ancien
-        if (passwordEncoder.matches(request.getNewPassword(), utilisateur.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Le nouveau mot de passe doit être différent de l'ancien");
-        }
-
-        // Changer le mot de passe
-        utilisateur.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        utilisateurRepository.save(utilisateur);
-
-        return ChangePasswordResponse.builder()
-                .message("Mot de passe modifié avec succès")
-                .emailUtilisateur(email)
-                .success(true)
-                .build();
-
     }
 
     public List<Utilisateur> getAllUsers() {
@@ -116,8 +140,15 @@ public class UtilisateurService {
     }
 
     @Transactional
-    public LogoutResponse logout(LogoutRequest request) {
-        String token = request.getToken();
+    public LogoutResponse logout(HttpServletRequest request) {
+        // Récupérer le token depuis le header Authorization
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+
+        // Extraire le token du header (format typique: "Bearer token_value")
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
 
         if (token == null || token.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token requis pour la déconnexion");

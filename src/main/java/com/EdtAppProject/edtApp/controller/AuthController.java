@@ -7,6 +7,7 @@ import com.EdtAppProject.edtApp.dto.LogoutResponse;
 import com.EdtAppProject.edtApp.dto.RegisterRequest;
 import com.EdtAppProject.edtApp.service.AuthService;
 import com.EdtAppProject.edtApp.service.UtilisateurService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,6 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT', 'ETUDIANT', 'PARENT')")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
     }
@@ -45,8 +45,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.refreshToken(request.get("refreshToken")));
     }
 
+
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logout(@RequestBody LogoutRequest request) {
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
+        // Pas besoin de @RequestBody car on ne récupère plus les données du corps
         return ResponseEntity.ok(utilisateurService.logout(request));
     }
 }
