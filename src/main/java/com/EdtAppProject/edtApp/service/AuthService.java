@@ -127,6 +127,7 @@ public class AuthService {
                 parent.setTypeParent(request.getTypeParent());
                 parent.setLieuResidence(request.getLieuResidence());
                 parent.setStatutCompte(EStatutCompte.EN_ATTENTE);
+                utilisateurRepository.save(parent);
                 return buildAuthResponse(parent);
 
             default:

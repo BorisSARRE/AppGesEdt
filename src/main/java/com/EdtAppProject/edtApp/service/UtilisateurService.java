@@ -36,12 +36,12 @@ public class UtilisateurService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         return utilisateurRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
     }
 
     public Utilisateur activerCompte(String id) {
         Utilisateur utilisateur = utilisateurRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
 
         utilisateur.setStatutCompte(EStatutCompte.ACTIF);
         return utilisateurRepository.save(utilisateur);
@@ -57,7 +57,7 @@ public class UtilisateurService {
 
     public Utilisateur updateProfile(String id, ProfileUpdateRequest request) {
         Utilisateur utilisateur = utilisateurRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
 
         utilisateur.setNom(request.getNom());
         utilisateur.setPrenom(request.getPrenom());

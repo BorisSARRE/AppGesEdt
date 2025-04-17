@@ -2,7 +2,6 @@ package com.EdtAppProject.edtApp.controller;
 
 import com.EdtAppProject.edtApp.dto.AuthResponse;
 import com.EdtAppProject.edtApp.dto.LoginRequest;
-import com.EdtAppProject.edtApp.dto.LogoutRequest;
 import com.EdtAppProject.edtApp.dto.LogoutResponse;
 import com.EdtAppProject.edtApp.dto.RegisterRequest;
 import com.EdtAppProject.edtApp.service.AuthService;
@@ -29,7 +28,6 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT', 'ETUDIANT', 'PARENT')")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }

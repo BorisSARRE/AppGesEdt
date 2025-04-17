@@ -17,6 +17,8 @@ import com.EdtAppProject.edtApp.entite.Enum.ESatutDevoir;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCours;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutEdt;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutMatiere;
+import com.EdtAppProject.edtApp.entite.Enum.ETitreEtudiant;
+import com.EdtAppProject.edtApp.entite.Etudiant;
 import com.EdtAppProject.edtApp.entite.Filiere;
 import com.EdtAppProject.edtApp.entite.Indisponibilite;
 import com.EdtAppProject.edtApp.entite.Matiere;
@@ -26,10 +28,12 @@ import com.EdtAppProject.edtApp.repository.CoursRepository;
 import com.EdtAppProject.edtApp.repository.DevoirRepository;
 import com.EdtAppProject.edtApp.repository.EmploiDuTempsRepository;
 import com.EdtAppProject.edtApp.repository.EnseignantRepository;
+import com.EdtAppProject.edtApp.repository.EtudiantRepository;
 import com.EdtAppProject.edtApp.repository.FiliereRepository;
 import com.EdtAppProject.edtApp.repository.IndisponibiliteRepository;
 import com.EdtAppProject.edtApp.repository.MatiereRepository;
 import com.EdtAppProject.edtApp.repository.SalleRepository;
+import com.EdtAppProject.edtApp.repository.UtilisateurRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -56,6 +60,8 @@ public class ServiceMetier {
     private final EnseignantRepository enseignantRepository;
     private final CoursRepository coursRepository;
     private final DevoirRepository devoirRepository;
+    private final EtudiantRepository etudiantRepository;
+    private final UtilisateurRepository utilisateurRepository;
     private final SbMapper mapper;
 
     /*
@@ -839,4 +845,86 @@ public class ServiceMetier {
 
     }
 
+
+    /**
+     **************** Gérer les délégués de filières *****************
+     */
+
+    /**
+     * Nommer un délégué.
+     * @param idEtudiant
+     * @return ResponseStatusException.
+     */
+    public ResponseStatusException nommerDelegue(String idEtudiant) {
+        Etudiant etudiant = etudiantRepository.findById(idEtudiant)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Étudiant non trouvé"));
+
+        Filiere filiere = etudiant.getFiliere();
+        if (filiere == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'étudiant n'appartient à aucune filière");
+        }
+
+        // Vérifier s'il y a déjà un délégué pour cette filière
+        Optional<Etudiant> delegueExistant = etudiantRepository.findByFiliereAndTitreEtudiant(
+                filiere, ETitreEtudiant.ETUDIANT_DELEGE);
+
+        if (delegueExistant.isPresent()) {
+
+            if (delegueExistant.get().getId().equals(idEtudiant)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet étudiant est déjà délégué de " +
+                        filiere.getNomFiliere() + " " + filiere.getNiveau());
+            }else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La filière " + filiere.getNomFiliere() + " "
+                        + filiere.getNiveau()+ " a déjà un délégué" );
+
+            }
+
+        }else {
+            etudiant.setTitreEtudiant(ETitreEtudiant.ETUDIANT_DELEGE);
+            utilisateurRepository.save(etudiant);
+            return new ResponseStatusException(HttpStatus.OK);
+        }
+
+    }
+
+    /**
+     * Retrograder un étudiant.
+     * @param idEtudiant
+     * @return ResponseStatusException
+     */
+    public ResponseStatusException retrograderDelegue(String idEtudiant) {
+        Etudiant etudiant = etudiantRepository.findById(idEtudiant)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Étudiant non trouvé"));
+
+        if (etudiant.getTitreEtudiant() != ETitreEtudiant.ETUDIANT_DELEGE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet étudiant n'est pas délégué");
+        }
+
+        etudiant.setTitreEtudiant(ETitreEtudiant.ETUDIANT_SIMPLE);
+        etudiantRepository.save(etudiant);
+
+        return new ResponseStatusException(HttpStatus.OK, "Cet étudiant n'est plus délégué de " + etudiant.getFiliere().getNomFiliere()+ " " + etudiant.getFiliere().getNiveau() );
+    }
+
+    /**
+     * Obtenir le délégué d'une filière.
+     * @param filiereId
+     * @return Etudiant
+     */
+    public Etudiant getDelegueByFiliere(String filiereId) {
+        Filiere filiere = filiereRepository.findById(filiereId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Filière non trouvée"));
+
+        return etudiantRepository.findByFiliereAndTitreEtudiant(filiere, ETitreEtudiant.ETUDIANT_DELEGE)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Aucun délégué n'est assigné à cette filière"));
+    }
+
+    /**
+     * Lister les délégués.
+     * @return List<Etudiant>
+     */
+    public List<Etudiant> getAllDelegue(){
+        return etudiantRepository.findByTitreEtudiant(ETitreEtudiant.ETUDIANT_DELEGE);
+    }
 }
