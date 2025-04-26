@@ -34,6 +34,7 @@ import com.EdtAppProject.edtApp.repository.IndisponibiliteRepository;
 import com.EdtAppProject.edtApp.repository.MatiereRepository;
 import com.EdtAppProject.edtApp.repository.SalleRepository;
 import com.EdtAppProject.edtApp.repository.UtilisateurRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -568,11 +570,56 @@ public class ServiceMetier {
      ***************** Gestions des cours *************************
      */
 
+
+
+    /**
+     * Vérifie si le professeur associé à un cours est disponible à la date prévue.
+     *
+     * @param coursDto Les données du cours à vérifier
+     * @return true si le professeur est disponible, false sinon
+     */
+    public boolean profDisponible(CoursDto coursDto) {
+
+        if (coursDto == null || coursDto.getIdMatiere() == null || coursDto.getDate() == null) {
+            return false;
+        }
+
+        try {
+            Matiere matiere = matiereRepository.findById(coursDto.getIdMatiere())
+                    .orElseThrow(() -> new EntityNotFoundException("Matière non trouvée avec l'ID: " + coursDto.getIdMatiere()));
+
+            Enseignant enseignant = matiere.getEnseignant();
+            if (enseignant == null) {
+                return false;
+            }
+
+            List<Indisponibilite> indisponibilites = indisponibiliteRepository.findByEnseignantId(enseignant.getId());
+
+            LocalDate dateCoursDto = coursDto.getDate();
+
+            for (Indisponibilite indisponibilite : indisponibilites) {
+                LocalDate dateDebut = indisponibilite.getDateDebut();
+                LocalDate dateFin = indisponibilite.getDateFin();
+
+                if (dateDebut != null &&
+                        (dateCoursDto.isEqual(dateDebut) || dateCoursDto.isAfter(dateDebut)) &&
+                        (dateFin == null || dateCoursDto.isEqual(dateFin) || dateCoursDto.isBefore(dateFin))) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     /**
      * Creer un cours.
      *
      * @param coursDto
-     * @return CoursDto
+     * @return boolean
      */
     public CoursDto creerCours(final CoursDto coursDto) {
 
@@ -590,6 +637,9 @@ public class ServiceMetier {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Un devoir est déjà programmé pour le " + coursDto.getDate() + " pour " + coursDto.getCrenau().getPlageHoraire());
 
+        }else if (!profDisponible(coursDto)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "L'enseignant n'est pas disponible à cette date.");
         } else {
             EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(coursDto.getIdEmploiDuTemps());
             if (coursDto.getDate().isBefore(emploiDuTemps.getDateDebut()) ||
@@ -627,6 +677,9 @@ public class ServiceMetier {
         } else if (this.devoirRepository.existsByDateAndCrenau(coursDto.getDate(), coursDto.getCrenau())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Un devoir est déjà programmé pour le " + coursDto.getDate() + " pour " + coursDto.getCrenau().getPlageHoraire());
+        }else if (!profDisponible(coursDto)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "L'enseignant n'est pas disponible à cette date.");
         } else {
             EmploiDuTemps emploiDuTemps = emploiDuTempsRepository.getReferenceById(coursDto.getIdEmploiDuTemps());
 
