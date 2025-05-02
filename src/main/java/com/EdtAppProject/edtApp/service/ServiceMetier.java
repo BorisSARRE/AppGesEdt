@@ -42,10 +42,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.Normalizer;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -269,7 +272,7 @@ public class ServiceMetier {
         if (!emploiDuTempsRepository.existsById(idEdt)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps n'existe pas !");
         } else if (emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.BROUILLON) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CCet emploi du tempse ne peut pas " +
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps ne peut pas " +
                     "être supprimé !");
         } else {
             emploiDuTempsRepository.deleteById(idEdt);
@@ -303,7 +306,7 @@ public class ServiceMetier {
         Optional<EmploiDuTemps> emploiDuTemps = emploiDuTempsRepository.findById(idEdt);
 
         if (emploiDuTemps.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cette filière n'existe pas !");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps n'existe pas !");
         } else if (emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.PUBLIE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " Cet emploi du temps ne peut pas être clos " +
                     "car il n'est pas encore publié ! ");
@@ -314,6 +317,26 @@ public class ServiceMetier {
                 return this.mapper.maps(c);
             }).toList();
 
+            return new ResponseStatusException(HttpStatus.OK);
+        }
+    }
+
+    public ResponseStatusException publishEdt(final String idEdt){
+        Optional<EmploiDuTemps> emploiDuTemps = emploiDuTempsRepository.findById(idEdt);
+        if(emploiDuTemps.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cet emploi du temps n'existe pas !");
+        } else if(emploiDuTempsRepository.getReferenceById(idEdt).getStatutEdt() != EStatutEdt.BROUILLON) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, " Cet emploi du temps ne peut pas être publié " +
+                    "car il n'est pas au brouillon ! ");
+        } else{
+            Clock clock = Clock.systemDefaultZone();
+            LocalDateTime maintenant = LocalDateTime.now(clock);
+            List<EmploiDuTempsDto> emploi = emploiDuTemps.stream().map(c -> {
+                c.setStatutEdt(EStatutEdt.PUBLIE);
+                c.setDatePublication(maintenant);
+                this.emploiDuTempsRepository.save(c);
+                return this.mapper.maps(c);
+            }).toList();
             return new ResponseStatusException(HttpStatus.OK);
         }
     }

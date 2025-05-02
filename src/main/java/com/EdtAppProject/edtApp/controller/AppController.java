@@ -132,6 +132,13 @@ public class AppController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PatchMapping("/edt/{id}/publish")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> publishEdt(@PathVariable("id") final String idEdt) {
+        this.serviceMetier.publishEdt(idEdt);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     /**
      ********** Endpoints pour Matiere ***********************
      */

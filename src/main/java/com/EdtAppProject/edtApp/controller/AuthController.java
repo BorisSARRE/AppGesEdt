@@ -38,7 +38,6 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT', 'ETUDIANT', 'PARENT')")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> request) {
         return ResponseEntity.ok(authService.refreshToken(request.get("refreshToken")));
     }
