@@ -6,6 +6,7 @@ import com.EdtAppProject.edtApp.dto.RegisterRequest;
 import com.EdtAppProject.edtApp.entite.Administration;
 import com.EdtAppProject.edtApp.entite.Enseignant;
 import com.EdtAppProject.edtApp.entite.Enum.EStatutCompte;
+import com.EdtAppProject.edtApp.entite.Enum.ETitreEtudiant;
 import com.EdtAppProject.edtApp.entite.Etudiant;
 import com.EdtAppProject.edtApp.entite.Filiere;
 import com.EdtAppProject.edtApp.entite.Parent;
@@ -96,22 +97,17 @@ public class AuthService {
                 etudiant.setPassword(passwordEncoder.encode(request.getPassword()));
                 etudiant.setRole(request.getRole());
                 etudiant.setIne(request.getIne());
-                etudiant.setTitreEtudiant(request.getTitreEtudiant());
+                etudiant.setTitreEtudiant(ETitreEtudiant.ETUDIANT_SIMPLE);
                 etudiant.setStatutCompte(EStatutCompte.EN_ATTENTE);
-                utilisateurRepository.save(etudiant);
-
-
-            if (request.getParentId() != null) {
-                Parent parent = parentRepository.findById(request.getParentId())
-                        .orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "Parent non trouvé"));
-                etudiant.setParent(parent);
-            }
-
-            if (request.getFiliereId() != null) {
                 Filiere filiere = filiereRepository.findById(request.getFiliereId())
-                        .orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND,"Filière non trouvée"));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Filière non trouvée"));
                 etudiant.setFiliere(filiere);
-            }
+                if (request.getParentId() != null) {
+                    Parent parent = parentRepository.findById(request.getParentId())
+                            .orElseThrow(() -> new ResponseStatusException( HttpStatus.NOT_FOUND, "Parent non trouvé"));
+                    etudiant.setParent(parent);
+                }
+                utilisateurRepository.save(etudiant);
                 return buildAuthResponse(etudiant);
 
 

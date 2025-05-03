@@ -1,13 +1,6 @@
 package com.EdtAppProject.edtApp.service;
 
-import com.EdtAppProject.edtApp.dto.CoursDto;
-import com.EdtAppProject.edtApp.dto.DevoirDto;
-import com.EdtAppProject.edtApp.dto.EmploiDuTempsDto;
-import com.EdtAppProject.edtApp.dto.EnseignantDto;
-import com.EdtAppProject.edtApp.dto.FiliereDto;
-import com.EdtAppProject.edtApp.dto.IndisponibiliteDto;
-import com.EdtAppProject.edtApp.dto.MatiereDto;
-import com.EdtAppProject.edtApp.dto.SalleDto;
+import com.EdtAppProject.edtApp.dto.*;
 import com.EdtAppProject.edtApp.entite.Cours;
 import com.EdtAppProject.edtApp.entite.Devoir;
 import com.EdtAppProject.edtApp.entite.EmploiDuTemps;
@@ -949,5 +942,9 @@ public class ServiceMetier {
      */
     public List<Etudiant> getAllDelegue(){
         return etudiantRepository.findByTitreEtudiant(ETitreEtudiant.ETUDIANT_DELEGE);
+    }
+
+    public String getFiliereOfUser(String id) {
+        return utilisateurRepository.findFiliereIdByUserId(id);
     }
 }

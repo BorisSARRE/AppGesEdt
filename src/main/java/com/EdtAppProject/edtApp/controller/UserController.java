@@ -1,9 +1,8 @@
 package com.EdtAppProject.edtApp.controller;
 
-import com.EdtAppProject.edtApp.dto.ChangePasswordRequest;
-import com.EdtAppProject.edtApp.dto.ChangePasswordResponse;
-import com.EdtAppProject.edtApp.dto.ProfileUpdateRequest;
+import com.EdtAppProject.edtApp.dto.*;
 import com.EdtAppProject.edtApp.entite.Utilisateur;
+import com.EdtAppProject.edtApp.service.ServiceMetier;
 import com.EdtAppProject.edtApp.service.UtilisateurService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController {
 
     private final UtilisateurService utilisateurService;
+    private final ServiceMetier serviceMetier;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT', 'ETUDIANT', 'PARENT')")
     @GetMapping("/me")
@@ -47,5 +47,9 @@ public class UserController {
     public ResponseEntity<ChangePasswordResponse> changePassword(@RequestBody ChangePasswordRequest request,
                                                                  HttpServletRequest httpServletRequest) {
         return new  ResponseEntity<>(utilisateurService.changePassword(request, httpServletRequest),HttpStatus.OK);
+    }
+    @GetMapping("/filiere/{id}")
+    public ResponseEntity<String> getUserFiliere(@PathVariable String id){
+        return new ResponseEntity<>(serviceMetier.getFiliereOfUser(id),HttpStatus.OK);
     }
 }

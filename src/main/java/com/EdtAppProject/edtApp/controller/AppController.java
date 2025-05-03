@@ -84,7 +84,6 @@ public class AppController {
     }
 
     @GetMapping("/filiere")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FiliereDto>> listerFiliere() {
         return new ResponseEntity<>(serviceMetier.listeFiliere(), HttpStatus.OK);
     }
@@ -119,7 +118,6 @@ public class AppController {
      * @return
      */
     @GetMapping("/edt")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ENSEIGNANT')")
     public ResponseEntity<List<EmploiDuTempsDto>> listEdtFiliere(@RequestParam(value = "recherche", required = false)
                                                                  final String recherche) {
         return new ResponseEntity<>(serviceMetier.listEdtFiliere(recherche), HttpStatus.OK);
@@ -257,7 +255,6 @@ public class AppController {
     }
 
     @GetMapping("/cours/{id1}/{id2}")
-    @PreAuthorize("hasAnyRole('ADMIN' ,'ENSEIGNANT')")
     public ResponseEntity<List<CoursDto>> listerCoursParEmploiDuTempsEtFiliere(@PathVariable("id1") final String idEmploiDuTemps,
                                                                                @PathVariable("id2") final String idFiliere) {
         List<CoursDto> coursDtos = serviceMetier.listerCoursParEmploiDuTempsEtFiliere(idEmploiDuTemps, idFiliere);
